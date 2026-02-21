@@ -11,6 +11,8 @@ import WorldTourPage from "./pages/WorldTourPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import FactoryPage from "./pages/FactoryPage";
 import ColoringPage from "./pages/ColoringPage";
+import TrafficPage from "./pages/TrafficPage";
+import LabPage from "./pages/LabPage";
 
 const queryClient = new QueryClient();
 
@@ -27,8 +29,8 @@ const App = () => (
             <Route path="/world-tour" element={<WorldTourPage />} />
             <Route path="/factory" element={<FactoryPage />} />
             <Route path="/coloring" element={<ColoringPage />} />
-            <Route path="/lab" element={<PlaceholderPage title="探秘实验室" emoji="🔬" desc="STEM科学实验等你来！" color="from-purple-fun/15 via-background to-sky/10" />} />
-            <Route path="/traffic" element={<PlaceholderPage title="交通英雄城" emoji="🚦" desc="学习交通安全规则！" color="from-coral/15 via-background to-grass/10" />} />
+            <Route path="/lab" element={<LabPage />} />
+            <Route path="/traffic" element={<TrafficPage />} />
             <Route path="/language" element={<PlaceholderPage title="语言魔法屋" emoji="📚" desc="认字学词真有趣！" color="from-golden/15 via-background to-sky/10" />} />
             <Route path="/music" element={<PlaceholderPage title="音乐律动" emoji="🎵" desc="敲击节奏玩音乐！" color="from-purple-fun/15 via-background to-sky/10" />} />
             <Route path="/story" element={<PlaceholderPage title="故事王国" emoji="📖" desc="互动绘本等你翻！" color="from-grass/15 via-background to-golden/10" />} />
