@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import WelcomePage from "./pages/WelcomePage";
 import WorldTourPage from "./pages/WorldTourPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
+import FactoryPage from "./pages/FactoryPage";
+import ColoringPage from "./pages/ColoringPage";
 
 const queryClient = new QueryClient();
 
@@ -23,11 +25,11 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/world-tour" element={<WorldTourPage />} />
+            <Route path="/factory" element={<FactoryPage />} />
+            <Route path="/coloring" element={<ColoringPage />} />
             <Route path="/lab" element={<PlaceholderPage title="探秘实验室" emoji="🔬" desc="STEM科学实验等你来！" color="from-purple-fun/15 via-background to-sky/10" />} />
-            <Route path="/factory" element={<PlaceholderPage title="建造工厂" emoji="🏗️" desc="拖拽零件组装道闸！" color="from-orange-warm/15 via-background to-golden/10" />} />
             <Route path="/traffic" element={<PlaceholderPage title="交通英雄城" emoji="🚦" desc="学习交通安全规则！" color="from-coral/15 via-background to-grass/10" />} />
             <Route path="/language" element={<PlaceholderPage title="语言魔法屋" emoji="📚" desc="认字学词真有趣！" color="from-golden/15 via-background to-sky/10" />} />
-            <Route path="/coloring" element={<PlaceholderPage title="涂色工厂" emoji="🎨" desc="给道闸涂上漂亮颜色！" color="from-coral/15 via-background to-golden/10" />} />
             <Route path="/music" element={<PlaceholderPage title="音乐律动" emoji="🎵" desc="敲击节奏玩音乐！" color="from-purple-fun/15 via-background to-sky/10" />} />
             <Route path="/story" element={<PlaceholderPage title="故事王国" emoji="📖" desc="互动绘本等你翻！" color="from-grass/15 via-background to-golden/10" />} />
             <Route path="/treasure" element={<PlaceholderPage title="寻宝乐园" emoji="🗺️" desc="找零件拼道闸！" color="from-orange-warm/15 via-background to-coral/10" />} />
