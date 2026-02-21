@@ -17,6 +17,8 @@ import LanguagePage from "./pages/LanguagePage";
 import MusicPage from "./pages/MusicPage";
 import StoryPage from "./pages/StoryPage";
 import TreasurePage from "./pages/TreasurePage";
+import CollectionPage from "./pages/CollectionPage";
+import ParentPage from "./pages/ParentPage";
 
 const queryClient = new QueryClient();
 
@@ -39,8 +41,8 @@ const App = () => (
             <Route path="/music" element={<MusicPage />} />
             <Route path="/story" element={<StoryPage />} />
             <Route path="/treasure" element={<TreasurePage />} />
-            <Route path="/collection" element={<PlaceholderPage title="我的收藏馆" emoji="🏆" desc="徽章、作品、星星都在这！" color="from-golden/15 via-background to-sky/10" />} />
-            <Route path="/parent" element={<PlaceholderPage title="家长区" emoji="🔑" desc="查看学习报告和设置" color="from-muted via-background to-muted" />} />
+            <Route path="/collection" element={<CollectionPage />} />
+            <Route path="/parent" element={<ParentPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
