@@ -501,8 +501,8 @@ const ColoringPage: React.FC = () => {
         )}
 
         <div className="flex justify-center mt-6">
-          <button onClick={() => { playClick(); navigate('/'); }} className="touch-target rounded-2xl bg-muted hover:bg-muted/80 px-6 py-3 text-lg font-bold transition-all active:scale-95">
-            🏠 回到地图
+          <button onClick={() => { playClick(); navigate(-1); }} className="touch-target rounded-2xl bg-muted hover:bg-muted/80 px-6 py-3 text-lg font-bold transition-all active:scale-95">
+            🗺️ 回到地图
           </button>
         </div>
       </div>
