@@ -6,6 +6,7 @@ import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { playClick, playSuccess, playStarCollect, playError } from '@/lib/sound';
 import { speak, delay } from '@/lib/speech';
 import { vibrate } from '@/lib/sound';
+import CountryBarrierSVG from '@/components/barriers/CountryBarrierSVG';
 
 interface BarrierCountry {
   id: string;
@@ -42,20 +43,7 @@ const countries: BarrierCountry[] = [
   { id: 'mx', country: '墨西哥', countryEn: 'Mexico', flag: '🇲🇽', barrierName: '社区共享闸', barrierNameEn: 'Community Gate', desc: '邻居们一起用的社区大门道闸！', descEn: 'Community shared neighborhood gates!', color: 'from-coral to-golden', emoji: '🏡', feature: '社区共享', x: 15, y: 42, quiz: { question: '墨西哥的社区闸是谁用的？', options: ['只有一家人', '邻居们一起用', '只有车用'], correct: 1 } },
 ];
 
-const BarrierSVG: React.FC<{ isLifted: boolean; color: string }> = ({ isLifted, color }) => (
-  <svg viewBox="0 0 120 100" className="w-32 h-24 mx-auto">
-    <rect x="20" y="60" width="20" height="35" rx="3" fill="hsl(220,10%,40%)" />
-    <rect x="22" y="62" width="16" height="8" rx="2" fill="hsl(195,100%,50%)" opacity="0.6" />
-    <g style={{ transformOrigin: '30px 62px', transition: 'transform 0.8s cubic-bezier(0.34,1.56,0.64,1)', transform: isLifted ? 'rotate(-85deg)' : 'rotate(0deg)' }}>
-      <rect x="30" y="58" width="80" height="8" rx="4" fill={color} />
-      <rect x="100" y="56" width="12" height="12" rx="6" fill="hsl(54,100%,50%)" />
-      {[45, 60, 75, 90].map(x => (
-        <rect key={x} x={x} y="58" width="4" height="8" rx="1" fill="hsl(0,0%,100%)" opacity="0.5" />
-      ))}
-    </g>
-    <rect x="0" y="92" width="120" height="8" rx="2" fill="hsl(142,30%,70%)" />
-  </svg>
-);
+// BarrierSVG removed - now using CountryBarrierSVG component
 
 const GlobeView: React.FC<{ countries: BarrierCountry[]; visited: Set<string>; onSelect: (c: BarrierCountry) => void }> = ({ countries, visited, onSelect }) => (
   <div className="relative w-full max-w-lg mx-auto bg-sky/10 rounded-[2rem] border-4 border-sky/30 overflow-hidden" style={{ height: '320px' }}>
@@ -154,7 +142,7 @@ const CountryCard: React.FC<{ country: BarrierCountry; onClose: () => void; onVi
         </div>
 
         <div className={`bg-gradient-to-br ${country.color} rounded-2xl p-4 mb-4`}>
-          <BarrierSVG isLifted={isLifted} color="hsl(0,72%,70%)" />
+          <CountryBarrierSVG countryId={country.id} isLifted={isLifted} />
           <div className="text-center mt-2">
             <span className="text-3xl">{country.emoji}</span>
             <h3 className="text-xl font-bold text-primary-foreground">{country.barrierName}</h3>

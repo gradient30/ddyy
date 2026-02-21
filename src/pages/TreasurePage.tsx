@@ -4,6 +4,7 @@ import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { useGame } from '@/contexts/GameContext';
 import { playClick, playSuccess, playStarCollect, playError, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
+import { ParkingTreasureScene, MallBasementScene, SchoolGateScene, ParkEntranceScene, HighwayTollScene } from '@/components/scenes/TreasureScenes';
 
 // ===================== LEVEL DATA =====================
 
@@ -107,28 +108,12 @@ const LEVELS: TreasureLevel[] = [
   },
 ];
 
-const SCENE_ITEMS: Record<number, { emoji: string; x: number; y: number; size: string }[]> = {
-  1: [
-    { emoji: '🚗', x: 20, y: 50, size: 'text-3xl' }, { emoji: '🚙', x: 60, y: 45, size: 'text-2xl' },
-    { emoji: '🏠', x: 10, y: 10, size: 'text-2xl' }, { emoji: '🌳', x: 90, y: 15, size: 'text-3xl' },
-    { emoji: '🚧', x: 50, y: 55, size: 'text-3xl' },
-  ],
-  2: [
-    { emoji: '🚘', x: 30, y: 40, size: 'text-3xl' }, { emoji: '🅿️', x: 85, y: 50, size: 'text-2xl' },
-    { emoji: '💡', x: 50, y: 10, size: 'text-xl' }, { emoji: '🚧', x: 45, y: 60, size: 'text-3xl' },
-  ],
-  3: [
-    { emoji: '🏫', x: 50, y: 8, size: 'text-4xl' }, { emoji: '🚸', x: 15, y: 45, size: 'text-2xl' },
-    { emoji: '🚧', x: 55, y: 50, size: 'text-3xl' }, { emoji: '🌺', x: 85, y: 40, size: 'text-xl' },
-  ],
-  4: [
-    { emoji: '🌳', x: 15, y: 15, size: 'text-4xl' }, { emoji: '🌸', x: 75, y: 30, size: 'text-xl' },
-    { emoji: '🚧', x: 50, y: 45, size: 'text-3xl' }, { emoji: '🦆', x: 30, y: 80, size: 'text-2xl' },
-  ],
-  5: [
-    { emoji: '🛣️', x: 50, y: 90, size: 'text-2xl' }, { emoji: '🚧', x: 40, y: 40, size: 'text-4xl' },
-    { emoji: '🚛', x: 15, y: 65, size: 'text-3xl' }, { emoji: '🏗️', x: 80, y: 20, size: 'text-2xl' },
-  ],
+const SCENE_COMPONENTS: Record<number, React.FC> = {
+  1: ParkingTreasureScene,
+  2: MallBasementScene,
+  3: SchoolGateScene,
+  4: ParkEntranceScene,
+  5: HighwayTollScene,
 };
 
 // ===================== ASSEMBLY MINI-GAME =====================
@@ -284,13 +269,12 @@ const TreasureScene: React.FC<{ level: TreasureLevel; onComplete: () => void }> 
     <div className="flex flex-col items-center gap-3">
       <p className="text-sm font-bold text-foreground">{level.sceneEmoji} {level.scene} — 找到 {found}/{total} 个零件</p>
 
-      <div className={`relative w-full h-64 rounded-3xl bg-gradient-to-br ${level.bgClass} overflow-hidden border-2 border-border`}>
-        {(SCENE_ITEMS[level.id] || []).map((item, i) => (
-          <div key={i} className={`absolute ${item.size} opacity-60 select-none`}
-            style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)' }}>
-            {item.emoji}
-          </div>
-        ))}
+      <div className={`relative w-full h-64 rounded-3xl overflow-hidden border-2 border-border`}>
+        {/* SVG Scene Background */}
+        {(() => {
+          const SceneComp = SCENE_COMPONENTS[level.id];
+          return SceneComp ? <SceneComp /> : null;
+        })()}
 
         {parts.map(part => (
           <button key={part.id}

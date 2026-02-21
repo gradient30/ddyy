@@ -4,6 +4,7 @@ import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { useGame } from '@/contexts/GameContext';
 import { playClick, playSuccess, playError, playBarrierLift, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
+import { AnatomyDiagram, LeverDiagram, SolarMotorDiagram, SensorDiagram } from '@/components/scenes/LabScenes';
 
 // ===================== PREDICTION COMPONENT =====================
 
@@ -113,16 +114,8 @@ const Exp1Anatomy: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-muted-foreground">点击道闸的每个部位 ({explored.size}/{parts.length})</p>
-      <div className="relative w-64 h-56">
-        <svg viewBox="0 0 200 180" className="w-full h-full">
-          <rect x="60" y="140" width="40" height="30" rx="5" fill="hsl(var(--foreground) / 0.3)" />
-          <rect x="72" y="60" width="16" height="85" rx="3" fill="hsl(var(--foreground) / 0.4)" />
-          <rect x="65" y="80" width="30" height="25" rx="5" fill="hsl(var(--primary) / 0.6)" />
-          <rect x="88" y="62" width="90" height="8" rx="4" fill="hsl(var(--coral-red))" />
-          <circle cx="92" cy="66" r="5" fill="hsl(var(--secondary))" />
-          <circle cx="80" cy="55" r="6" fill="hsl(var(--grass-green))" />
-          <circle cx="55" cy="130" r="5" fill="hsl(var(--purple-fun))" />
-        </svg>
+      <div className="relative w-72 h-64">
+        <AnatomyDiagram />
         {parts.map(part => (
           <button key={part.id} onClick={() => handleClick(part)}
             className={`absolute w-10 h-10 rounded-full flex items-center justify-center transition-all text-lg ${
@@ -171,13 +164,11 @@ const Exp2Lever: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-muted-foreground">拖动重物到杠杆右边，看看会怎样？</p>
-      <div className="relative w-full max-w-xs h-32"
+      <LeverDiagram weightPos={weightPos} tilt={tilt} />
+      <div className="relative w-full max-w-xs h-20"
         onTouchMove={(e) => { const rect = e.currentTarget.getBoundingClientRect(); handleDrag(e.touches[0].clientX, rect); }}
         onMouseMove={(e) => { if (e.buttons) handleDrag(e.clientX, e.currentTarget.getBoundingClientRect()); }}>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[16px] border-r-[16px] border-b-[20px] border-transparent border-b-foreground/40" />
-        <div className="absolute bottom-[22px] left-[10%] right-[10%] h-3 bg-primary/50 rounded-full origin-center transition-transform duration-300"
-          style={{ transform: `rotate(${tilt}deg)` }} />
-        <div className="absolute bottom-8 text-3xl cursor-grab active:cursor-grabbing select-none transition-all duration-100"
+        <div className="absolute bottom-4 text-3xl cursor-grab active:cursor-grabbing select-none transition-all duration-100"
           style={{ left: `${weightPos}%`, transform: 'translateX(-50%)' }}>
           🏋️
         </div>
@@ -223,19 +214,16 @@ const Exp3MotorSolar: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-muted-foreground">点击太阳给电池充电！☀️</p>
+      <SolarMotorDiagram charged={charged} spinning={spinning} />
       <div className="flex items-end gap-6">
         <button onClick={handleSunClick} disabled={done}
           className="text-5xl active:scale-110 transition-transform animate-float">☀️</button>
         <div className="flex flex-col items-center gap-1">
-          <div className="w-12 h-20 border-3 border-foreground/30 rounded-lg overflow-hidden relative">
-            <div className="absolute bottom-0 left-0 right-0 bg-accent transition-all duration-300 rounded-b" style={{ height: `${charged}%` }} />
-            <div className="absolute inset-0 flex items-center justify-center font-bold text-xs text-foreground">{charged}%</div>
-          </div>
-          <span className="text-xs text-muted-foreground">🔋电池</span>
+          <span className="text-xs text-muted-foreground">🔋 {charged}%</span>
         </div>
         <div className="flex flex-col items-center gap-1">
           <div className={`text-4xl ${spinning ? 'animate-spin' : ''}`} style={{ animationDuration: '0.5s' }}>⚙️</div>
-          <span className="text-xs text-muted-foreground">电机 Motor</span>
+          <span className="text-xs text-muted-foreground">电机</span>
         </div>
       </div>
       <div className="w-full max-w-xs h-3 rounded-full bg-muted overflow-hidden">
@@ -289,21 +277,8 @@ const Exp4Sensor: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-muted-foreground">试试挡住红外线，看道闸会怎样？</p>
-      <div className="relative w-64 h-40">
-        <svg viewBox="0 0 200 120" className="w-full h-full">
-          <rect x="20" y="70" width="30" height="40" rx="5" fill="hsl(var(--foreground) / 0.3)" />
-          <rect x="30" y="30" width="10" height="45" rx="3" fill="hsl(var(--foreground) / 0.4)" />
-          <g style={{ transformOrigin: '40px 35px', transition: 'transform 0.7s', transform: barrierUp ? 'rotate(-85deg)' : 'rotate(0deg)' }}>
-            <rect x="40" y="31" width="80" height="6" rx="3" fill="hsl(var(--coral-red))" />
-          </g>
-          <line x1="15" y1="95" x2="185" y2="95"
-            stroke={blocking ? 'hsl(var(--destructive))' : 'hsl(var(--destructive) / 0.3)'}
-            strokeWidth="2" strokeDasharray={blocking ? 'none' : '5,5'} />
-          <circle cx="15" cy="95" r="4" fill="hsl(var(--purple-fun))" />
-          <circle cx="185" cy="95" r="4" fill="hsl(var(--purple-fun))" />
-          <text x="15" y="115" fontSize="8" fill="hsl(var(--muted-foreground))" textAnchor="middle">👁️</text>
-          <text x="185" y="115" fontSize="8" fill="hsl(var(--muted-foreground))" textAnchor="middle">👁️</text>
-        </svg>
+      <div className="relative w-72 h-48">
+        <SensorDiagram blocking={blocking} barrierUp={barrierUp} />
       </div>
       <div className="flex gap-3">
         <button onClick={handleBlock} disabled={blocking || done}

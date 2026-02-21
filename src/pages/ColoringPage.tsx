@@ -71,24 +71,214 @@ function drawBarrierTemplate(ctx: CanvasRenderingContext2D, templateId: string, 
   const armY = h - 155;
 
   if (templateId === 'folding') {
+    // Folding arm - two segments with hinge
     ctx.beginPath();
-    ctx.moveTo(cx, armY); ctx.lineTo(cx + 60, armY); ctx.lineTo(cx + 60, armY - 50); ctx.lineTo(cx + 120, armY - 50);
+    ctx.moveTo(cx, armY + 5); ctx.lineTo(cx + 55, armY + 5);
     ctx.lineWidth = 12; ctx.strokeStyle = '#E2E8F0'; ctx.stroke();
     ctx.lineWidth = 3; ctx.strokeStyle = '#1E293B'; ctx.stroke();
+    // Hinge circle
+    ctx.beginPath(); ctx.arc(cx + 55, armY + 5, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#94A3B8'; ctx.fill(); ctx.stroke();
+    // Second segment going up
+    ctx.beginPath();
+    ctx.moveTo(cx + 55, armY + 5); ctx.lineTo(cx + 110, armY - 35);
+    ctx.lineWidth = 10; ctx.strokeStyle = '#E2E8F0'; ctx.stroke();
+    ctx.lineWidth = 3; ctx.strokeStyle = '#1E293B'; ctx.stroke();
   } else if (templateId === 'fence') {
-    for (let i = 0; i < 4; i++) {
-      ctx.fillRect(cx + 10 + i * 30, armY - 5, 8, 25);
-      ctx.strokeRect(cx + 10 + i * 30, armY - 5, 8, 25);
+    // Fence barrier - horizontal rails + vertical bars
+    for (let i = 0; i < 5; i++) {
+      ctx.fillRect(cx + 8 + i * 25, armY - 8, 6, 30);
+      ctx.strokeRect(cx + 8 + i * 25, armY - 8, 6, 30);
     }
-    ctx.fillRect(cx, armY, 130, 8);
-    ctx.strokeRect(cx, armY, 130, 8);
-    ctx.fillRect(cx, armY + 12, 130, 8);
-    ctx.strokeRect(cx, armY + 12, 130, 8);
+    ctx.fillRect(cx, armY - 2, 135, 6);
+    ctx.strokeRect(cx, armY - 2, 135, 6);
+    ctx.fillRect(cx, armY + 14, 135, 6);
+    ctx.strokeRect(cx, armY + 14, 135, 6);
+  } else if (templateId === 'solar') {
+    // Solar barrier - arm + solar panel on pillar top
+    ctx.fillRect(cx, armY, 130, 14);
+    ctx.strokeRect(cx, armY, 130, 14);
+    for (let i = 0; i < 4; i++) ctx.strokeRect(cx + 20 + i * 28, armY, 10, 14);
+    // Solar panel on top
+    ctx.fillStyle = '#1E3A5F';
+    ctx.fillRect(cx - 22, h - 175, 44, 16);
+    ctx.strokeRect(cx - 22, h - 175, 44, 16);
+    // Grid lines
+    ctx.strokeStyle = '#60A5FA';
+    ctx.lineWidth = 0.8;
+    for (let i = 1; i < 4; i++) {
+      ctx.beginPath(); ctx.moveTo(cx - 22 + i * 11, h - 175); ctx.lineTo(cx - 22 + i * 11, h - 159); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.moveTo(cx - 22, h - 167); ctx.lineTo(cx + 22, h - 167); ctx.stroke();
+    ctx.strokeStyle = '#1E293B'; ctx.lineWidth = 3;
+  } else if (templateId === 'railway') {
+    // Railway crossing - X-shaped double arm
+    ctx.save();
+    ctx.translate(cx, armY + 7);
+    ctx.rotate(-0.15);
+    ctx.fillRect(0, -5, 120, 10); ctx.strokeRect(0, -5, 120, 10);
+    for (let i = 0; i < 4; i++) ctx.strokeRect(15 + i * 28, -5, 8, 10);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(cx, armY + 7);
+    ctx.rotate(0.15);
+    ctx.fillRect(0, -5, 120, 10); ctx.strokeRect(0, -5, 120, 10);
+    for (let i = 0; i < 4; i++) ctx.strokeRect(15 + i * 28, -5, 8, 10);
+    ctx.restore();
+    // Red warning light
+    ctx.beginPath(); ctx.arc(cx, h - 170, 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#FCA5A5'; ctx.fill(); ctx.strokeStyle = '#1E293B'; ctx.stroke();
+  } else if (templateId === 'bollard') {
+    // Rising bollard - cylinder from ground, no arm
+    ctx.clearRect(cx - 25, h - 160, 50, 80); // Clear the pillar we drew
+    // Ground slot
+    ctx.fillStyle = '#94A3B8';
+    ctx.fillRect(cx - 20, h - 60, 40, 20);
+    ctx.strokeRect(cx - 20, h - 60, 40, 20);
+    // Bollard cylinder
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.moveTo(cx - 15, h - 55);
+    ctx.lineTo(cx - 15, h - 120);
+    ctx.arc(cx, h - 120, 15, Math.PI, 0);
+    ctx.lineTo(cx + 15, h - 55);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // Reflective stripes
+    ctx.fillStyle = '#FEF3C7';
+    ctx.fillRect(cx - 14, h - 90, 28, 6);
+    ctx.strokeRect(cx - 14, h - 90, 28, 6);
+    ctx.fillRect(cx - 14, h - 78, 28, 6);
+    ctx.strokeRect(cx - 14, h - 78, 28, 6);
+  } else if (templateId === 'cute') {
+    // Cute barrier - bunny ears on pillar
+    ctx.fillRect(cx, armY, 130, 14);
+    ctx.strokeRect(cx, armY, 130, 14);
+    for (let i = 0; i < 4; i++) ctx.strokeRect(cx + 20 + i * 28, armY, 10, 14);
+    // Bunny ears on pillar top
+    ctx.fillStyle = '#FBCFE8';
+    // Left ear
+    ctx.beginPath();
+    ctx.ellipse(cx - 8, h - 180, 6, 18, -0.2, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    // Right ear
+    ctx.beginPath();
+    ctx.ellipse(cx + 8, h - 180, 6, 18, 0.2, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    // Inner ear
+    ctx.fillStyle = '#FCA5A5';
+    ctx.beginPath(); ctx.ellipse(cx - 8, h - 180, 3, 10, -0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx + 8, h - 180, 3, 10, 0.2, 0, Math.PI * 2); ctx.fill();
+    // Face on pillar
+    ctx.fillStyle = '#1E293B';
+    ctx.beginPath(); ctx.arc(cx - 5, h - 148, 2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + 5, h - 148, 2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, h - 142, 3, 0, Math.PI); ctx.stroke();
+  } else if (templateId === 'robot') {
+    // Robot barrier - robot head shape, LED eyes
+    ctx.fillRect(cx, armY, 130, 14);
+    ctx.strokeRect(cx, armY, 130, 14);
+    for (let i = 0; i < 4; i++) ctx.strokeRect(cx + 20 + i * 28, armY, 10, 14);
+    // Robot head on pillar (square head)
+    ctx.fillStyle = '#CBD5E1';
+    ctx.fillRect(cx - 18, h - 185, 36, 28);
+    ctx.strokeRect(cx - 18, h - 185, 36, 28);
+    // Antenna
+    ctx.fillRect(cx - 2, h - 195, 4, 12);
+    ctx.strokeRect(cx - 2, h - 195, 4, 12);
+    ctx.beginPath(); ctx.arc(cx, h - 196, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#FCA5A5'; ctx.fill(); ctx.stroke();
+    // LED eyes
+    ctx.fillStyle = '#60A5FA';
+    ctx.fillRect(cx - 12, h - 178, 8, 8);
+    ctx.strokeRect(cx - 12, h - 178, 8, 8);
+    ctx.fillRect(cx + 4, h - 178, 8, 8);
+    ctx.strokeRect(cx + 4, h - 178, 8, 8);
+    // Mouth
+    ctx.fillStyle = '#1E293B';
+    ctx.fillRect(cx - 8, h - 165, 16, 4);
+    ctx.strokeRect(cx - 8, h - 165, 16, 4);
+  } else if (templateId === 'tree') {
+    // Tree barrier - trunk pillar, branch arm
+    // Replace pillar with trunk
+    ctx.clearRect(cx - 12, h - 160, 24, 80);
+    ctx.fillStyle = '#92400E';
+    ctx.fillRect(cx - 10, h - 150, 20, 70);
+    ctx.strokeRect(cx - 10, h - 150, 20, 70);
+    // Bark texture
+    ctx.strokeStyle = '#78350F'; ctx.lineWidth = 1;
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.moveTo(cx - 8, h - 145 + i * 14);
+      ctx.quadraticCurveTo(cx, h - 140 + i * 14, cx + 8, h - 145 + i * 14);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = '#1E293B'; ctx.lineWidth = 3;
+    // Branch arm (organic curve)
+    ctx.beginPath();
+    ctx.moveTo(cx, armY + 5);
+    ctx.quadraticCurveTo(cx + 50, armY - 15, cx + 100, armY + 5);
+    ctx.quadraticCurveTo(cx + 105, armY + 12, cx + 95, armY + 15);
+    ctx.quadraticCurveTo(cx + 50, armY + 5, cx, armY + 15);
+    ctx.closePath();
+    ctx.fillStyle = '#92400E'; ctx.fill(); ctx.stroke();
+    // Leaves at end
+    ctx.fillStyle = '#86EFAC';
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.arc(cx + 100 + Math.cos(i * 1.2) * 10, armY + Math.sin(i * 1.2) * 10, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Tree top leaves
+    ctx.beginPath(); ctx.arc(cx, h - 160, 22, 0, Math.PI * 2);
+    ctx.fillStyle = '#86EFAC'; ctx.fill();
+    ctx.strokeStyle = '#1E293B'; ctx.stroke();
+  } else if (templateId === 'rocket') {
+    // Rocket barrier - pillar as rocket body, arm as exhaust
+    ctx.clearRect(cx - 12, h - 160, 24, 80);
+    // Rocket body (pillar)
+    ctx.fillStyle = '#E2E8F0';
+    ctx.beginPath();
+    ctx.moveTo(cx, h - 180);
+    ctx.lineTo(cx - 14, h - 145);
+    ctx.lineTo(cx - 14, h - 80);
+    ctx.lineTo(cx + 14, h - 80);
+    ctx.lineTo(cx + 14, h - 145);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // Nose cone
+    ctx.fillStyle = '#FCA5A5';
+    ctx.beginPath();
+    ctx.moveTo(cx, h - 190);
+    ctx.lineTo(cx - 10, h - 170);
+    ctx.lineTo(cx + 10, h - 170);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // Window
+    ctx.beginPath(); ctx.arc(cx, h - 155, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#93C5FD'; ctx.fill(); ctx.stroke();
+    // Fins
+    ctx.fillStyle = '#FCA5A5';
+    ctx.beginPath();
+    ctx.moveTo(cx - 14, h - 90); ctx.lineTo(cx - 22, h - 78); ctx.lineTo(cx - 14, h - 78); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx + 14, h - 90); ctx.lineTo(cx + 22, h - 78); ctx.lineTo(cx + 14, h - 78); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    // Exhaust arm
+    ctx.fillStyle = '#FFFFFF';
+    const gradient = ctx.createLinearGradient(cx, armY, cx + 130, armY);
+    gradient.addColorStop(0, '#FCA5A5');
+    gradient.addColorStop(0.3, '#FDE68A');
+    gradient.addColorStop(0.6, '#FDBA74');
+    gradient.addColorStop(1, '#FEF3C7');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(cx, armY, 130, 14);
+    ctx.strokeRect(cx, armY, 130, 14);
   } else {
     // Default straight arm
     ctx.fillRect(cx, armY, 130, 14);
     ctx.strokeRect(cx, armY, 130, 14);
-    // Stripes (outlines)
     for (let i = 0; i < 4; i++) {
       ctx.strokeRect(cx + 20 + i * 28, armY, 10, 14);
     }
