@@ -1,5 +1,9 @@
 // 道闸乐园 - Web Speech API 语音合成
 
+export function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function speak(text: string, lang: 'zh-CN' | 'en-US' = 'zh-CN', rate = 0.8): Promise<void> {
   return new Promise((resolve) => {
     if (!('speechSynthesis' in window)) {
@@ -18,7 +22,9 @@ export function speak(text: string, lang: 'zh-CN' | 'en-US' = 'zh-CN', rate = 0.
 }
 
 export function speakBilingual(zh: string, en: string, rate = 0.8): Promise<void> {
-  return speak(zh, 'zh-CN', rate).then(() => speak(en, 'en-US', rate));
+  return speak(zh, 'zh-CN', rate)
+    .then(() => delay(400))
+    .then(() => speak(en, 'en-US', rate));
 }
 
 export function stopSpeaking(): void {

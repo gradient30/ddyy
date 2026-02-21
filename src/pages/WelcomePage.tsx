@@ -4,7 +4,7 @@ import { useGame } from '@/contexts/GameContext';
 import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import GlobalNav from '@/components/nav/GlobalNav';
 import { playSuccess, playClick } from '@/lib/sound';
-import { speak } from '@/lib/speech';
+import { speak, delay, stopSpeaking } from '@/lib/speech';
 
 const greetingsZh = [
   '小朋友你好呀！我是小闸闸！',
@@ -41,45 +41,64 @@ const WelcomePage: React.FC = () => {
   const [showSubtitle, setShowSubtitle] = useState('');
 
   useEffect(() => {
-    // Intro sequence
-    const t1 = setTimeout(() => {
+    let cancelled = false;
+
+    async function runIntro() {
+      await delay(800);
+      if (cancelled) return;
+
+      // Phase 1: Greeting
       setPhase('greeting');
       setMascotMood('waving');
       setShowSubtitle(greetingsZh[greetIdx]);
-      speak(greetingsZh[greetIdx], 'zh-CN', 0.85);
-    }, 800);
+      await speak(greetingsZh[greetIdx], 'zh-CN', 0.85);
+      if (cancelled) return;
 
-    const t2 = setTimeout(() => {
+      await delay(400);
+      if (cancelled) return;
+
       setShowSubtitle(greetingsEn[greetIdx]);
-      speak(greetingsEn[greetIdx], 'en-US', 0.8);
-    }, 3500);
+      await speak(greetingsEn[greetIdx], 'en-US', 0.8);
+      if (cancelled) return;
 
-    const t3 = setTimeout(() => {
+      await delay(500);
+      if (cancelled) return;
+
+      // Phase 2: Fun fact
       setPhase('fact');
       setMascotMood('excited');
       const fact = funFacts[factIdx];
       setShowSubtitle(fact.zh);
-      speak(fact.zh, 'zh-CN', 0.85);
-    }, 6000);
+      await speak(fact.zh, 'zh-CN', 0.85);
+      if (cancelled) return;
 
-    const t4 = setTimeout(() => {
-      const fact = funFacts[factIdx];
+      await delay(400);
+      if (cancelled) return;
+
       setShowSubtitle(fact.en);
-      speak(fact.en, 'en-US', 0.8);
-    }, 9000);
+      await speak(fact.en, 'en-US', 0.8);
+      if (cancelled) return;
 
-    const t5 = setTimeout(() => {
+      await delay(500);
+      if (cancelled) return;
+
+      // Phase 3: Ready
       setPhase('ready');
       setMascotMood('happy');
       setShowSubtitle('准备好了吗？出发探险啦！');
       playSuccess();
-    }, 11500);
+    }
 
-    return () => { [t1, t2, t3, t4, t5].forEach(clearTimeout); };
+    runIntro();
+    return () => {
+      cancelled = true;
+      stopSpeaking();
+    };
   }, [greetIdx, factIdx]);
 
   const handleExplore = () => {
     playClick();
+    stopSpeaking();
     addStars(1);
     navigate('/');
   };

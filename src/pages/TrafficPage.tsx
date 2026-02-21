@@ -6,6 +6,55 @@ import { useGame } from '@/contexts/GameContext';
 import { playClick, playSuccess, playError, playBarrierLift, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
 
+// ===================== WHY PROMPT COMPONENT =====================
+
+const WhyPrompt: React.FC<{
+  question: string;
+  options: { text: string; correct: boolean }[];
+  onDone: () => void;
+}> = ({ question, options, onDone }) => {
+  const [picked, setPicked] = useState<number | null>(null);
+  const [result, setResult] = useState<boolean | null>(null);
+
+  const handlePick = (idx: number) => {
+    playClick();
+    setPicked(idx);
+    const isCorrect = options[idx].correct;
+    setResult(isCorrect);
+    if (isCorrect) {
+      playSuccess();
+      vibrate(60);
+      speak('答对了！你真会思考！');
+      setTimeout(onDone, 1500);
+    } else {
+      playError();
+      speak('再想想为什么呢？');
+      setTimeout(() => { setPicked(null); setResult(null); }, 1200);
+    }
+  };
+
+  return (
+    <div className="bg-golden/15 rounded-2xl p-4 text-center animate-pop-in mt-3">
+      <p className="text-sm font-bold text-foreground mb-1">🤔 想一想为什么？</p>
+      <p className="text-base font-bold text-foreground mb-3">{question}</p>
+      <div className="grid gap-2">
+        {options.map((opt, i) => (
+          <button key={i} onClick={() => handlePick(i)}
+            disabled={result === true}
+            className={`p-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${
+              picked === i && result === true ? 'bg-accent/30 ring-2 ring-accent' :
+              picked === i && result === false ? 'bg-destructive/20 ring-2 ring-destructive' :
+              'bg-card hover:bg-primary/10 border border-border'
+            }`}>
+            {opt.text}
+          </button>
+        ))}
+      </div>
+      {result === true && <p className="text-xs text-accent mt-2 animate-pop-in">🌟 +1 思考之星！</p>}
+    </div>
+  );
+};
+
 // ===================== LEVEL DATA =====================
 
 interface Level {
@@ -25,6 +74,15 @@ const LEVELS: Level[] = [
   { id: 4, title: '过斑马线', emoji: '🦓', rule: '行人优先，慢慢走', ruleEn: 'Pedestrians first, walk slowly', word: '行', wordEn: 'walk' },
   { id: 5, title: '小司机', emoji: '🏎️', rule: '安全驾驶最重要', ruleEn: 'Safe driving is most important', word: '安全', wordEn: 'safe' },
 ];
+
+// Why prompts per level
+const WHY_PROMPTS: Record<number, { question: string; options: { text: string; correct: boolean }[] }> = {
+  1: { question: '为什么车要停在停车位里？', options: [{ text: '保持秩序，让别的车也有地方停', correct: true }, { text: '随便停哪里都可以', correct: false }] },
+  2: { question: '为什么红灯要停下来？', options: [{ text: '让其他方向的车和行人安全通过', correct: true }, { text: '因为红色不好看', correct: false }] },
+  3: { question: '为什么要数清楚车的数量？', options: [{ text: '帮助管理停车场，知道还有没有空位', correct: true }, { text: '数数好玩', correct: false }] },
+  4: { question: '为什么行人过马路要走斑马线？', options: [{ text: '司机看到斑马线会减速，更安全', correct: true }, { text: '斑马线好看', correct: false }] },
+  5: { question: '为什么开车不能太快？', options: [{ text: '速度太快来不及刹车，容易出事故', correct: true }, { text: '开快点可以早到', correct: false }] },
+};
 
 // ===================== LEVEL 1: PARKING =====================
 
@@ -61,29 +119,21 @@ const Level1Parking: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
     <div ref={containerRef} className="relative w-full h-64 bg-muted rounded-3xl overflow-hidden touch-none"
       onTouchMove={(e) => handleMove(e.touches[0].clientX)}
       onMouseMove={(e) => e.buttons && handleMove(e.clientX)}>
-      {/* Road */}
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-foreground/20 rounded-b-3xl" />
       <div className="absolute bottom-8 left-0 right-0 h-1 border-t-2 border-dashed border-secondary" />
-      
-      {/* Parking spot */}
       <div className="absolute bottom-2 right-[15%] w-16 h-16 border-2 border-dashed border-primary rounded-xl flex items-center justify-center">
         <span className="text-xs font-bold text-primary">🅿️</span>
       </div>
-
-      {/* Barrier */}
       <div className="absolute bottom-16 right-[35%]">
         <div className="w-3 h-12 bg-foreground/40 rounded-t" />
         <div className={`absolute top-0 left-3 w-14 h-2 bg-coral rounded origin-left transition-transform duration-700 ${barrierUp ? '-rotate-[85deg]' : 'rotate-0'}`}>
           <div className="absolute right-0 top-0 w-2 h-2 rounded-full bg-secondary" />
         </div>
       </div>
-
-      {/* Car */}
       <div className="absolute bottom-4 transition-all duration-150 text-4xl select-none cursor-grab active:cursor-grabbing"
         style={{ left: `${carX}%`, transform: 'translateX(-50%)' }}>
         🚙
       </div>
-
       {!parked && (
         <button onClick={handleCheck}
           className="absolute top-3 right-3 touch-target rounded-2xl bg-accent text-accent-foreground font-bold px-4 py-2 active:scale-95 transition-transform">
@@ -134,13 +184,11 @@ const Level2TrafficLight: React.FC<{ onComplete: () => void }> = ({ onComplete }
 
   return (
     <div className="flex flex-col items-center gap-4">
-      {/* Traffic light */}
       <div className="bg-foreground/80 rounded-2xl p-3 flex flex-col gap-2 items-center w-16">
         <div className={`w-10 h-10 rounded-full ${lightColor === 'red' ? lightColors.red : 'bg-foreground/30'}`} />
         <div className={`w-10 h-10 rounded-full ${lightColor === 'yellow' ? lightColors.yellow : 'bg-foreground/30'}`} />
         <div className={`w-10 h-10 rounded-full ${lightColor === 'green' ? lightColors.green : 'bg-foreground/30'}`} />
       </div>
-
       <div className="flex gap-3">
         {[
           { action: 'stop', label: '🛑 停', bg: 'bg-destructive/20 hover:bg-destructive/30' },
@@ -245,19 +293,15 @@ const Level4Crosswalk: React.FC<{ onComplete: () => void }> = ({ onComplete }) =
         {weather === 'rainy' ? '🌧️ 下雨了！' : '☀️ 晴天！'} 帮{animal}过斑马线
       </p>
       <div className="relative w-full max-w-xs h-32 bg-muted rounded-2xl overflow-hidden">
-        {/* Road */}
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-16 bg-foreground/20" />
-        {/* Zebra stripes */}
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="absolute top-1/2 -translate-y-1/2 h-16 w-3 bg-card"
             style={{ left: `${15 + i * 14}%` }} />
         ))}
-        {/* Animal */}
         <div className="absolute top-1/2 -translate-y-1/2 text-3xl transition-all duration-500"
           style={{ left: `${5 + animalPos * 18}%` }}>
           {animal}
         </div>
-        {/* Weather */}
         {weather === 'rainy' && (
           <div className="absolute top-1 left-0 right-0 text-center text-xs opacity-50">
             💧💧💧💧💧💧
@@ -278,11 +322,10 @@ const Level4Crosswalk: React.FC<{ onComplete: () => void }> = ({ onComplete }) =
 // ===================== LEVEL 5: DRIVING =====================
 
 const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const [carLane, setCarLane] = useState(1); // 0=left 1=center 2=right
+  const [carLane, setCarLane] = useState(1);
   const [score, setScore] = useState(0);
   const [obstacles, setObstacles] = useState<{ lane: number; top: number; id: number }[]>([]);
   const [gameOver, setGameOver] = useState(false);
-  const frameRef = useRef<number>(0);
   const nextId = useRef(0);
 
   useEffect(() => {
@@ -290,7 +333,6 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
     const interval = setInterval(() => {
       setObstacles(prev => {
         const moved = prev.map(o => ({ ...o, top: o.top + 5 })).filter(o => o.top < 110);
-        // Check collision
         const hit = moved.some(o => o.top > 75 && o.top < 95 && o.lane === carLane);
         if (hit) {
           playError();
@@ -298,10 +340,8 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
           clearInterval(interval);
           return moved;
         }
-        // Score for dodged
         const dodged = prev.filter(o => o.top <= 95).length - moved.filter(o => o.top <= 95).length;
         if (dodged > 0) setScore(s => s + dodged);
-        // Spawn
         if (Math.random() < 0.1) {
           moved.push({ lane: Math.floor(Math.random() * 3), top: -10, id: nextId.current++ });
         }
@@ -330,19 +370,16 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
     <div className="flex flex-col items-center gap-3">
       <p className="font-bold text-foreground">躲避障碍！得分: {score}/10</p>
       <div className="relative w-48 h-64 bg-foreground/10 rounded-2xl overflow-hidden">
-        {/* Lanes */}
         {[1, 2].map(i => (
           <div key={i} className="absolute top-0 bottom-0 w-px border-l border-dashed border-muted-foreground/30"
             style={{ left: `${(i * 100) / 3}%` }} />
         ))}
-        {/* Obstacles */}
         {obstacles.map(o => (
           <div key={o.id} className="absolute text-2xl transition-none"
             style={{ left: `${(o.lane * 100) / 3 + 16.6}%`, top: `${o.top}%`, transform: 'translate(-50%, -50%)' }}>
             🚧
           </div>
         ))}
-        {/* Car */}
         <div className="absolute bottom-4 text-3xl transition-all duration-150"
           style={{ left: `${(carLane * 100) / 3 + 16.6}%`, transform: 'translateX(-50%)' }}>
           🚙
@@ -367,21 +404,28 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
 const TrafficPage: React.FC = () => {
   const navigate = useNavigate();
   const { addStars, addBadge } = useGame();
-  const [currentLevel, setCurrentLevel] = useState(0); // 0 = menu
+  const [currentLevel, setCurrentLevel] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
+  const [showWhy, setShowWhy] = useState<number | null>(null);
 
   const handleLevelComplete = useCallback((levelId: number) => {
+    // Show "Why?" prompt after completing a level
+    setShowWhy(levelId);
+  }, []);
+
+  const handleWhyDone = useCallback((levelId: number) => {
+    setShowWhy(null);
     setCompleted(prev => {
       const next = new Set(prev);
       next.add(levelId);
-      addStars(2);
+      addStars(3); // Extra star for thinking!
       if (next.size === 5) {
         addBadge('交通小英雄');
         speak('恭喜你！获得交通小英雄徽章！');
       }
       return next;
     });
-    setTimeout(() => setCurrentLevel(0), 2500);
+    setTimeout(() => setCurrentLevel(0), 1500);
   }, [addStars, addBadge]);
 
   const renderLevel = () => {
@@ -431,7 +475,7 @@ const TrafficPage: React.FC = () => {
           </div>
         ) : (
           <div className="max-w-md mx-auto">
-            <button onClick={() => { playClick(); setCurrentLevel(0); }}
+            <button onClick={() => { playClick(); setCurrentLevel(0); setShowWhy(null); }}
               className="touch-target rounded-2xl bg-card hover:bg-muted px-4 py-2 font-bold text-foreground mb-4 active:scale-95 transition-all">
               ← 返回关卡
             </button>
@@ -439,6 +483,14 @@ const TrafficPage: React.FC = () => {
               <h2 className="text-xl font-black text-center text-foreground mb-1">{LEVELS[currentLevel - 1].emoji} {LEVELS[currentLevel - 1].title}</h2>
               <p className="text-center text-sm text-muted-foreground mb-4">{LEVELS[currentLevel - 1].rule}</p>
               {renderLevel()}
+              {/* Why prompt after level complete */}
+              {showWhy && WHY_PROMPTS[showWhy] && (
+                <WhyPrompt
+                  question={WHY_PROMPTS[showWhy].question}
+                  options={WHY_PROMPTS[showWhy].options}
+                  onDone={() => handleWhyDone(showWhy)}
+                />
+              )}
             </div>
           </div>
         )}

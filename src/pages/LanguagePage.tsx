@@ -38,7 +38,7 @@ const VOCAB: Word[] = [
   { zh: '星', en: 'star', pinyin: 'xīng', emoji: '⭐', category: '基础' },
 ];
 
-type GameMode = 'menu' | 'match4' | 'flashcard';
+type GameMode = 'menu' | 'match4' | 'flashcard' | 'spell';
 
 // ===================== 4-WAY MATCH GAME =====================
 
@@ -83,10 +83,8 @@ const Match4Game: React.FC<{ onScore: () => void }> = ({ onScore }) => {
 
   if (!target) return null;
 
-  const prompt = matchType === 'emoji' ? target.emoji :
-                 matchType === 'zh' ? target.zh : target.en;
-  const promptLabel = matchType === 'emoji' ? '找到这个图片对应的词' :
-                      matchType === 'zh' ? '找到这个汉字对应的图片' : '找到这个英语单词的图片';
+  const prompt = matchType === 'emoji' ? target.emoji : matchType === 'zh' ? target.zh : target.en;
+  const promptLabel = matchType === 'emoji' ? '找到这个图片对应的词' : matchType === 'zh' ? '找到这个汉字对应的图片' : '找到这个英语单词的图片';
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -135,9 +133,7 @@ const FlashcardMode: React.FC<{ onScore: () => void }> = ({ onScore }) => {
   const handleFlip = () => {
     playClick();
     setFlipped(!flipped);
-    if (!flipped) {
-      speakBilingual(word.zh, word.en);
-    }
+    if (!flipped) speakBilingual(word.zh, word.en);
   };
 
   const handleNext = () => {
@@ -177,6 +173,133 @@ const FlashcardMode: React.FC<{ onScore: () => void }> = ({ onScore }) => {
             className="touch-target rounded-2xl bg-accent/20 hover:bg-accent/30 font-bold px-4 py-2 active:scale-95 transition-all text-foreground">
             ✅ 学会了！
           </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ===================== SPELL MODE (NEW!) =====================
+
+const SpellMode: React.FC<{ onScore: () => void }> = ({ onScore }) => {
+  const spellableWords = VOCAB.filter(w => w.en.length >= 2 && w.en.length <= 6);
+  const [wordIdx, setWordIdx] = useState(0);
+  const [placed, setPlaced] = useState<string[]>([]);
+  const [available, setAvailable] = useState<string[]>([]);
+  const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [score, setScore] = useState(0);
+
+  const word = spellableWords[wordIdx % spellableWords.length];
+
+  // Setup round
+  useEffect(() => {
+    const letters = word.en.split('');
+    const shuffled = [...letters].sort(() => Math.random() - 0.5);
+    // Ensure shuffled differs from original for words > 1 letter
+    if (shuffled.join('') === letters.join('') && letters.length > 1) {
+      const tmp = shuffled[0];
+      shuffled[0] = shuffled[1];
+      shuffled[1] = tmp;
+    }
+    setAvailable(shuffled);
+    setPlaced([]);
+    setFeedback(null);
+  }, [wordIdx, word.en]);
+
+  const handlePickLetter = (idx: number) => {
+    playClick();
+    vibrate(20);
+    const letter = available[idx];
+    const newPlaced = [...placed, letter];
+    setPlaced(newPlaced);
+    setAvailable(prev => prev.filter((_, i) => i !== idx));
+
+    // Check when all letters placed
+    if (newPlaced.length === word.en.length) {
+      const spelled = newPlaced.join('');
+      if (spelled === word.en) {
+        setFeedback('correct');
+        playSuccess();
+        vibrate(100);
+        setScore(s => s + 1);
+        onScore();
+        speakBilingual(word.zh, word.en);
+        setTimeout(() => setWordIdx(i => i + 1), 2000);
+      } else {
+        setFeedback('wrong');
+        playError();
+        speak('顺序不对，再试一次！');
+        setTimeout(() => {
+          // Reset
+          const letters = word.en.split('');
+          setAvailable([...letters].sort(() => Math.random() - 0.5));
+          setPlaced([]);
+          setFeedback(null);
+        }, 1200);
+      }
+    }
+  };
+
+  const handleUndo = () => {
+    if (placed.length === 0 || feedback) return;
+    playClick();
+    const last = placed[placed.length - 1];
+    setPlaced(prev => prev.slice(0, -1));
+    setAvailable(prev => [...prev, last]);
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-bold text-muted-foreground">已拼: {score}</span>
+      </div>
+
+      {/* Target word display */}
+      <div className="text-center">
+        <span className="text-5xl">{word.emoji}</span>
+        <p className="text-2xl font-black text-foreground mt-1">{word.zh}</p>
+        <p className="text-sm text-muted-foreground">{word.pinyin}</p>
+        <p className="text-xs text-muted-foreground mt-1">拼出英文单词！</p>
+      </div>
+
+      {/* Placed letters slots */}
+      <div className="flex gap-2 justify-center">
+        {word.en.split('').map((_, i) => (
+          <div key={i} className={`w-11 h-11 rounded-xl border-2 flex items-center justify-center text-xl font-black transition-all ${
+            placed[i]
+              ? feedback === 'correct' ? 'bg-accent/30 border-accent' :
+                feedback === 'wrong' ? 'bg-destructive/20 border-destructive' :
+                'bg-primary/10 border-primary'
+              : 'border-dashed border-muted-foreground/40'
+          }`}>
+            {placed[i] || ''}
+          </div>
+        ))}
+      </div>
+
+      {/* Available letters */}
+      <div className="flex gap-2 flex-wrap justify-center">
+        {available.map((letter, i) => (
+          <button key={`${letter}-${i}`} onClick={() => handlePickLetter(i)}
+            disabled={feedback !== null}
+            className="w-12 h-12 rounded-2xl bg-card border-2 border-border hover:border-primary/40 text-xl font-black text-foreground active:scale-90 transition-all shadow-sm">
+            {letter}
+          </button>
+        ))}
+      </div>
+
+      {/* Undo button */}
+      {placed.length > 0 && !feedback && (
+        <button onClick={handleUndo}
+          className="text-sm text-muted-foreground hover:text-foreground underline">
+          ↩️ 撤销
+        </button>
+      )}
+
+      {feedback === 'correct' && (
+        <div className="text-center animate-pop-in">
+          <p className="text-xl">🎉 拼对了！</p>
+          <p className="text-sm text-muted-foreground">{word.emoji} {word.zh} = {word.en}</p>
         </div>
       )}
     </div>
@@ -231,6 +354,14 @@ const LanguagePage: React.FC = () => {
                     <p className="text-sm text-muted-foreground">一个一个认，带发音哦</p>
                   </div>
                 </button>
+                <button onClick={() => { playClick(); setMode('spell'); }}
+                  className="flex items-center gap-4 p-5 rounded-3xl bg-card border-2 border-border hover:border-primary/30 transition-all active:scale-[0.97]">
+                  <span className="text-4xl">🔤</span>
+                  <div className="text-left">
+                    <p className="font-bold text-foreground">拼单词</p>
+                    <p className="text-sm text-muted-foreground">看图拼英文，锻炼记忆力！</p>
+                  </div>
+                </button>
               </div>
             </>
           ) : (
@@ -241,9 +372,11 @@ const LanguagePage: React.FC = () => {
               </button>
               <div className="bg-card rounded-3xl shadow-lg p-5">
                 <h2 className="text-xl font-black text-center text-foreground mb-4">
-                  {mode === 'match4' ? '🎯 四连匹配' : '🃏 翻转卡片'}
+                  {mode === 'match4' ? '🎯 四连匹配' : mode === 'flashcard' ? '🃏 翻转卡片' : '🔤 拼单词'}
                 </h2>
-                {mode === 'match4' ? <Match4Game onScore={handleScore} /> : <FlashcardMode onScore={handleScore} />}
+                {mode === 'match4' && <Match4Game onScore={handleScore} />}
+                {mode === 'flashcard' && <FlashcardMode onScore={handleScore} />}
+                {mode === 'spell' && <SpellMode onScore={handleScore} />}
               </div>
             </>
           )}
