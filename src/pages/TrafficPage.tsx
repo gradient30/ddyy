@@ -5,6 +5,7 @@ import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { useGame } from '@/contexts/GameContext';
 import { playClick, playSuccess, playError, playBarrierLift, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
+import { ParkingLotScene, IntersectionScene, CrosswalkScene, DrivingRoadScene } from '@/components/scenes/TrafficScenes';
 
 // ===================== WHY PROMPT COMPONENT =====================
 
@@ -116,9 +117,11 @@ const Level1Parking: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-64 bg-muted rounded-3xl overflow-hidden touch-none"
+    <div ref={containerRef} className="relative w-full h-64 rounded-3xl overflow-hidden touch-none"
       onTouchMove={(e) => handleMove(e.touches[0].clientX)}
       onMouseMove={(e) => e.buttons && handleMove(e.clientX)}>
+      <ParkingLotScene />
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-foreground/10 rounded-b-3xl" />
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-foreground/20 rounded-b-3xl" />
       <div className="absolute bottom-8 left-0 right-0 h-1 border-t-2 border-dashed border-secondary" />
       <div className="absolute bottom-2 right-[15%] w-16 h-16 border-2 border-dashed border-primary rounded-xl flex items-center justify-center">
@@ -183,7 +186,8 @@ const Level2TrafficLight: React.FC<{ onComplete: () => void }> = ({ onComplete }
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 relative">
+      <IntersectionScene />
       <div className="bg-foreground/80 rounded-2xl p-3 flex flex-col gap-2 items-center w-16">
         <div className={`w-10 h-10 rounded-full ${lightColor === 'red' ? lightColors.red : 'bg-foreground/30'}`} />
         <div className={`w-10 h-10 rounded-full ${lightColor === 'yellow' ? lightColors.yellow : 'bg-foreground/30'}`} />
@@ -292,7 +296,8 @@ const Level4Crosswalk: React.FC<{ onComplete: () => void }> = ({ onComplete }) =
       <p className="text-lg font-bold text-foreground">
         {weather === 'rainy' ? '🌧️ 下雨了！' : '☀️ 晴天！'} 帮{animal}过斑马线
       </p>
-      <div className="relative w-full max-w-xs h-32 bg-muted rounded-2xl overflow-hidden">
+      <div className="relative w-full max-w-xs h-32 rounded-2xl overflow-hidden">
+        <CrosswalkScene />
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-16 bg-foreground/20" />
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="absolute top-1/2 -translate-y-1/2 h-16 w-3 bg-card"
@@ -347,7 +352,7 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
         }
         return moved;
       });
-    }, 100);
+    }, 150);
     return () => clearInterval(interval);
   }, [carLane, gameOver]);
 
@@ -369,7 +374,8 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
   return (
     <div className="flex flex-col items-center gap-3">
       <p className="font-bold text-foreground">躲避障碍！得分: {score}/10</p>
-      <div className="relative w-48 h-64 bg-foreground/10 rounded-2xl overflow-hidden">
+      <div className="relative w-48 h-64 rounded-2xl overflow-hidden">
+        <DrivingRoadScene />
         {[1, 2].map(i => (
           <div key={i} className="absolute top-0 bottom-0 w-px border-l border-dashed border-muted-foreground/30"
             style={{ left: `${(i * 100) / 3}%` }} />

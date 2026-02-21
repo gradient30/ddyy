@@ -116,11 +116,13 @@ const FactoryPage: React.FC = () => {
   const [dragPart, setDragPart] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [mascotMsg, setMascotMsg] = useState('选择一种模式开始建造吧！');
+  const [typeSelected, setTypeSelected] = useState(false);
 
   const handleStartTutorial = (type: BarrierType) => {
     playClick();
     setSelectedType(type);
     setMode('tutorial');
+    setTypeSelected(true);
     setTutorialStep(0);
     setSlots({});
     setMascotMsg(buildSteps[0].desc);
@@ -202,7 +204,7 @@ const FactoryPage: React.FC = () => {
         {mode === 'select' && (
           <div className="max-w-md mx-auto space-y-4 animate-pop-in">
             <button
-              onClick={() => { playClick(); setMode('tutorial'); setMascotMsg('先选一种道闸类型吧！'); }}
+              onClick={() => { playClick(); setMode('tutorial'); setTypeSelected(false); setMascotMsg('先选一种道闸类型吧！'); }}
               className="w-full touch-target rounded-3xl bg-gradient-to-r from-sky to-grass text-primary-foreground p-6 text-left shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
             >
               <div className="text-3xl mb-1">📖</div>
@@ -221,7 +223,7 @@ const FactoryPage: React.FC = () => {
         )}
 
         {/* 教学 - 选类型 */}
-        {mode === 'tutorial' && tutorialStep === 0 && Object.keys(slots).length === 0 && (
+        {mode === 'tutorial' && !typeSelected && (
           <div className="max-w-md mx-auto grid gap-3 animate-pop-in">
             {barrierTypes.map(t => (
               <button key={t.id} onClick={() => handleStartTutorial(t.id)}
@@ -237,7 +239,7 @@ const FactoryPage: React.FC = () => {
         )}
 
         {/* 教学模式 - 步骤 */}
-        {mode === 'tutorial' && (tutorialStep > 0 || Object.keys(slots).length > 0) && (
+        {mode === 'tutorial' && typeSelected && (
           <div className="max-w-md mx-auto animate-pop-in">
             {/* 进度 */}
             <div className="flex gap-1 mb-4 justify-center">
@@ -322,7 +324,7 @@ const FactoryPage: React.FC = () => {
                   className="touch-target rounded-2xl bg-gradient-to-r from-golden to-orange-warm text-primary-foreground px-6 py-3 text-lg font-black shadow-lg hover:scale-105 active:scale-95 transition-all">
                   🚧 试运行！
                 </button>
-                <button onClick={() => { playClick(); setMode('select'); setSlots({}); setMascotMsg('再建一个吧！'); }}
+                <button onClick={() => { playClick(); setMode('select'); setSlots({}); setTypeSelected(false); setMascotMsg('再建一个吧！'); }}
                   className="touch-target rounded-2xl bg-muted hover:bg-muted/80 px-6 py-3 text-lg font-bold transition-all active:scale-95">
                   🔄 再建一个
                 </button>

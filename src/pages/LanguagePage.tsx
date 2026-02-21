@@ -17,25 +17,25 @@ interface Word {
 
 const VOCAB: Word[] = [
   { zh: '车', en: 'car', pinyin: 'chē', emoji: '🚗', category: '交通' },
-  { zh: '门', en: 'gate', pinyin: 'mén', emoji: '🚧', category: '交通' },
+  { zh: '门', en: 'gate', pinyin: 'mén', emoji: '🚪', category: '建筑' },
   { zh: '停', en: 'stop', pinyin: 'tíng', emoji: '🛑', category: '交通' },
-  { zh: '行', en: 'go', pinyin: 'xíng', emoji: '🚶', category: '交通' },
-  { zh: '红', en: 'red', pinyin: 'hóng', emoji: '🔴', category: '颜色' },
-  { zh: '绿', en: 'green', pinyin: 'lǜ', emoji: '🟢', category: '颜色' },
-  { zh: '蓝', en: 'blue', pinyin: 'lán', emoji: '🔵', category: '颜色' },
-  { zh: '黄', en: 'yellow', pinyin: 'huáng', emoji: '🟡', category: '颜色' },
-  { zh: '太阳', en: 'sun', pinyin: 'tài yáng', emoji: '☀️', category: 'STEM' },
-  { zh: '电', en: 'electric', pinyin: 'diàn', emoji: '⚡', category: 'STEM' },
+  { zh: '行', en: 'go', pinyin: 'xíng', emoji: '🚶', category: '动作' },
+  { zh: '红', en: 'red', pinyin: 'hóng', emoji: '🍎', category: '颜色' },
+  { zh: '绿', en: 'green', pinyin: 'lǜ', emoji: '🌿', category: '颜色' },
+  { zh: '蓝', en: 'blue', pinyin: 'lán', emoji: '🌊', category: '颜色' },
+  { zh: '黄', en: 'yellow', pinyin: 'huáng', emoji: '🌻', category: '颜色' },
+  { zh: '太阳', en: 'sun', pinyin: 'tài yáng', emoji: '☀️', category: '自然' },
+  { zh: '电', en: 'electric', pinyin: 'diàn', emoji: '⚡', category: '科技' },
   { zh: '安全', en: 'safe', pinyin: 'ān quán', emoji: '🛡️', category: '交通' },
-  { zh: '大', en: 'big', pinyin: 'dà', emoji: '🐘', category: '基础' },
-  { zh: '小', en: 'small', pinyin: 'xiǎo', emoji: '🐭', category: '基础' },
-  { zh: '上', en: 'up', pinyin: 'shàng', emoji: '⬆️', category: '基础' },
-  { zh: '下', en: 'down', pinyin: 'xià', emoji: '⬇️', category: '基础' },
-  { zh: '开', en: 'open', pinyin: 'kāi', emoji: '🔓', category: '基础' },
-  { zh: '关', en: 'close', pinyin: 'guān', emoji: '🔒', category: '基础' },
-  { zh: '圆', en: 'circle', pinyin: 'yuán', emoji: '⭕', category: '形状' },
-  { zh: '方', en: 'square', pinyin: 'fāng', emoji: '⬜', category: '形状' },
-  { zh: '星', en: 'star', pinyin: 'xīng', emoji: '⭐', category: '基础' },
+  { zh: '大', en: 'big', pinyin: 'dà', emoji: '🐘', category: '大小' },
+  { zh: '小', en: 'small', pinyin: 'xiǎo', emoji: '🐭', category: '大小' },
+  { zh: '上', en: 'up', pinyin: 'shàng', emoji: '🎈', category: '方向' },
+  { zh: '下', en: 'down', pinyin: 'xià', emoji: '🪂', category: '方向' },
+  { zh: '开', en: 'open', pinyin: 'kāi', emoji: '📖', category: '动作' },
+  { zh: '关', en: 'close', pinyin: 'guān', emoji: '📕', category: '动作' },
+  { zh: '圆', en: 'circle', pinyin: 'yuán', emoji: '🏀', category: '形状' },
+  { zh: '方', en: 'square', pinyin: 'fāng', emoji: '🧊', category: '形状' },
+  { zh: '星', en: 'star', pinyin: 'xīng', emoji: '⭐', category: '自然' },
 ];
 
 type GameMode = 'menu' | 'match4' | 'flashcard' | 'spell';
@@ -51,9 +51,22 @@ const Match4Game: React.FC<{ onScore: () => void }> = ({ onScore }) => {
   const [score, setScore] = useState(0);
 
   const setupRound = useCallback(() => {
-    const shuffled = [...VOCAB].sort(() => Math.random() - 0.5);
-    const picked = shuffled.slice(0, 4);
-    const tgt = picked[Math.floor(Math.random() * 4)];
+    // Pick target first, then pick 3 distractors from DIFFERENT categories
+    const targetIdx = Math.floor(Math.random() * VOCAB.length);
+    const tgt = VOCAB[targetIdx];
+    const otherCategories = VOCAB.filter(w => w.category !== tgt.category && w.zh !== tgt.zh);
+    const sameCategory = VOCAB.filter(w => w.category === tgt.category && w.zh !== tgt.zh);
+    // Pick at most 1 from same category, rest from different
+    const distractors: Word[] = [];
+    if (sameCategory.length > 0 && Math.random() > 0.5) {
+      distractors.push(sameCategory[Math.floor(Math.random() * sameCategory.length)]);
+    }
+    const shuffledOthers = [...otherCategories].sort(() => Math.random() - 0.5);
+    while (distractors.length < 3 && shuffledOthers.length > 0) {
+      const next = shuffledOthers.pop()!;
+      if (!distractors.find(d => d.zh === next.zh)) distractors.push(next);
+    }
+    const picked = [tgt, ...distractors].sort(() => Math.random() - 0.5);
     const types: ('emoji' | 'zh' | 'en')[] = ['emoji', 'zh', 'en'];
     setWords(picked);
     setTarget(tgt);
@@ -92,8 +105,13 @@ const Match4Game: React.FC<{ onScore: () => void }> = ({ onScore }) => {
         <span className="text-sm font-bold text-muted-foreground">得分: {score}</span>
       </div>
       <p className="text-sm text-muted-foreground">{promptLabel}</p>
-      <div className={`text-5xl p-4 rounded-3xl bg-primary/10 ${feedback === 'correct' ? 'animate-pop-in' : ''}`}>
-        {prompt}
+      <div className="text-center">
+        <div className={`text-5xl p-4 rounded-3xl bg-primary/10 inline-block ${feedback === 'correct' ? 'animate-pop-in' : ''}`}>
+          {prompt}
+        </div>
+        {matchType === 'zh' && (
+          <p className="text-sm text-muted-foreground mt-1">{target.pinyin}</p>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
         {words.map(word => {
