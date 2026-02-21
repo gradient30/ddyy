@@ -2,8 +2,8 @@ import React, { useState, useCallback } from 'react';
 import GlobalNav from '@/components/nav/GlobalNav';
 import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { useGame } from '@/contexts/GameContext';
-import { playClick, playSuccess, vibrate } from '@/lib/sound';
-import { speak } from '@/lib/speech';
+import { playClick, playSuccess, playError, vibrate } from '@/lib/sound';
+import { speak, delay } from '@/lib/speech';
 
 // ===================== STORY DATA =====================
 
@@ -14,6 +14,7 @@ interface StoryNode {
   choices?: { label: string; next: string; emoji: string }[];
   ending?: string;
   badge?: string;
+  thinkPrompt?: { question: string; options: string[] };
 }
 
 interface Story {
@@ -29,6 +30,7 @@ const STORIES: Story[] = [
     id: 1, title: '小兔选道闸', emoji: '🐰', desc: '帮小兔选对道闸回家',
     nodes: {
       start: { id: 'start', text: '小兔开车来到停车场，前面有两个道闸，一个亮着绿灯，一个亮着红灯。', emoji: '🐰🚗',
+        thinkPrompt: { question: '你觉得小兔应该走哪个？为什么？', options: ['绿灯安全可以走', '红灯也能走'] },
         choices: [
           { label: '走绿灯道闸', next: 'green', emoji: '🟢' },
           { label: '走红灯道闸', next: 'red', emoji: '🔴' },
@@ -36,6 +38,7 @@ const STORIES: Story[] = [
       green: { id: 'green', text: '绿灯亮了，道闸缓缓升起，小兔安全通过了！小兔开心地说："绿灯行，真安全！"', emoji: '✅🎉',
         ending: '🌟 完美结局！小兔安全回家了！', badge: '绿灯小卫士' },
       red: { id: 'red', text: '红灯亮着，道闸紧紧关着。小兔等了一会儿...', emoji: '🛑',
+        thinkPrompt: { question: '红灯关着门，小兔该怎么办？', options: ['耐心等待最安全', '冲过去更快'] },
         choices: [
           { label: '耐心等绿灯', next: 'wait', emoji: '⏰' },
           { label: '试试闯过去', next: 'crash', emoji: '💨' },
@@ -50,11 +53,13 @@ const STORIES: Story[] = [
     id: 2, title: '小熊修道闸', emoji: '🐻', desc: '帮小熊修好坏掉的道闸',
     nodes: {
       start: { id: 'start', text: '小区的道闸坏了！车子们排着长队。小熊决定帮忙修理。先检查哪里？', emoji: '🐻🔧',
+        thinkPrompt: { question: '道闸不动了，你觉得是哪里坏了？', options: ['可能是电机没电了', '可能是传感器坏了'] },
         choices: [
           { label: '检查电机', next: 'motor', emoji: '⚙️' },
           { label: '检查传感器', next: 'sensor', emoji: '👁️' },
         ]},
       motor: { id: 'motor', text: '小熊发现电机没电了！需要给它充电。用什么充电呢？', emoji: '⚙️❌',
+        thinkPrompt: { question: '什么能源最环保？', options: ['太阳能最环保', '手摇也不错'] },
         choices: [
           { label: '太阳能板', next: 'solar', emoji: '☀️' },
           { label: '手摇发电', next: 'hand', emoji: '💪' },
@@ -76,6 +81,7 @@ const STORIES: Story[] = [
           { label: '数停车场的车', next: 'count', emoji: '🚗' },
         ]},
       barrier: { id: 'barrier', text: '哇！道闸一会儿升一会儿降，像在跳舞！小猫看得入迷了。突然一辆车开过来...', emoji: '🚧💃',
+        thinkPrompt: { question: '车来了，小猫在道闸旁边，怎么办？', options: ['赶紧到安全区', '继续看没关系'] },
         choices: [
           { label: '站在安全区', next: 'safe', emoji: '🛡️' },
           { label: '继续看', next: 'danger', emoji: '👀' },
@@ -113,6 +119,7 @@ const STORIES: Story[] = [
     id: 5, title: '道闸运动会', emoji: '🏅', desc: '道闸们比赛谁升得最快',
     nodes: {
       start: { id: 'start', text: '今天是道闸运动会！三个道闸比赛：直臂闸、折臂闸、围栏闸。你帮谁加油？', emoji: '🏁🚧',
+        thinkPrompt: { question: '你觉得哪种道闸速度最快？', options: ['直臂闸又直又快', '折臂闸更灵活'] },
         choices: [
           { label: '直臂闸', next: 'straight', emoji: '📏' },
           { label: '折臂闸', next: 'folding', emoji: '📐' },
@@ -130,18 +137,69 @@ const STORIES: Story[] = [
   },
 ];
 
+// ===================== THINKING PROMPT =====================
+
+const ThinkingPrompt: React.FC<{
+  prompt: { question: string; options: string[] };
+  onDone: () => void;
+}> = ({ prompt, onDone }) => {
+  const [picked, setPicked] = useState<number | null>(null);
+
+  const handlePick = (idx: number) => {
+    playClick();
+    vibrate(30);
+    setPicked(idx);
+    speak(`你选了"${prompt.options[idx]}"，好有想法！`);
+    setTimeout(onDone, 1500);
+  };
+
+  return (
+    <div className="bg-golden/15 rounded-2xl p-4 text-center animate-pop-in">
+      <p className="text-sm font-bold text-foreground mb-1">🤔 想一想</p>
+      <p className="text-base font-bold text-foreground mb-3">{prompt.question}</p>
+      <div className="grid gap-2">
+        {prompt.options.map((opt, i) => (
+          <button key={i} onClick={() => handlePick(i)}
+            disabled={picked !== null}
+            className={`p-3 rounded-xl text-sm font-bold transition-all active:scale-95 ${
+              picked === i ? 'bg-accent/30 ring-2 ring-accent' : 'bg-card hover:bg-primary/10 border border-border'
+            }`}>
+            {opt}
+          </button>
+        ))}
+      </div>
+      {picked !== null && <p className="text-xs text-muted-foreground mt-2 animate-pop-in">👍 好想法！继续看故事...</p>}
+    </div>
+  );
+};
+
 // ===================== STORY READER =====================
 
 const StoryReader: React.FC<{ story: Story; onFinish: (badge?: string) => void }> = ({ story, onFinish }) => {
   const [nodeId, setNodeId] = useState('start');
+  const [showThinking, setShowThinking] = useState(false);
+  const [thinkingDone, setThinkingDone] = useState(false);
   const node = story.nodes[nodeId];
 
-  const handleChoice = (next: string) => {
+  // Show thinking prompt on node change
+  React.useEffect(() => {
+    if (node?.thinkPrompt) {
+      setShowThinking(true);
+      setThinkingDone(false);
+    } else {
+      setShowThinking(false);
+      setThinkingDone(true);
+    }
+  }, [nodeId, node?.thinkPrompt]);
+
+  const handleChoice = async (next: string) => {
     playClick();
     vibrate(30);
     setNodeId(next);
     const nextNode = story.nodes[next];
-    speak(nextNode.text);
+    if (nextNode) {
+      await speak(nextNode.text);
+    }
   };
 
   if (!node) return null;
@@ -151,7 +209,13 @@ const StoryReader: React.FC<{ story: Story; onFinish: (badge?: string) => void }
       <div className="text-6xl animate-pop-in">{node.emoji}</div>
       <p className="text-base text-foreground text-center leading-relaxed max-w-xs font-bold">{node.text}</p>
 
-      {node.ending ? (
+      {/* Thinking prompt before choices */}
+      {showThinking && node.thinkPrompt && !thinkingDone && (
+        <ThinkingPrompt prompt={node.thinkPrompt} onDone={() => setThinkingDone(true)} />
+      )}
+
+      {/* Show choices only after thinking */}
+      {thinkingDone && node.ending ? (
         <div className="text-center animate-pop-in">
           <p className="text-xl mb-3">{node.ending}</p>
           <button onClick={() => { playSuccess(); vibrate(100); onFinish(node.badge); }}
@@ -159,7 +223,7 @@ const StoryReader: React.FC<{ story: Story; onFinish: (badge?: string) => void }
             🎉 完成！
           </button>
         </div>
-      ) : node.choices ? (
+      ) : thinkingDone && node.choices ? (
         <div className="grid gap-2 w-full max-w-xs">
           {node.choices.map(choice => (
             <button key={choice.next} onClick={() => handleChoice(choice.next)}
@@ -192,6 +256,15 @@ const StoryPage: React.FC = () => {
     setTimeout(() => setActiveStory(null), 1500);
   }, [addStars, addBadge, completed.size]);
 
+  const handleStartStory = async (storyId: number) => {
+    playClick();
+    setActiveStory(storyId);
+    const story = STORIES.find(s => s.id === storyId);
+    if (story) {
+      await speak(story.nodes.start.text);
+    }
+  };
+
   return (
     <>
       <GlobalNav />
@@ -208,7 +281,7 @@ const StoryPage: React.FC = () => {
               <div className="grid gap-3">
                 {STORIES.map(story => (
                   <button key={story.id}
-                    onClick={() => { playClick(); setActiveStory(story.id); speak(story.nodes.start.text); }}
+                    onClick={() => handleStartStory(story.id)}
                     className={`flex items-center gap-4 p-4 rounded-3xl transition-all active:scale-[0.97] ${
                       completed.has(story.id) ? 'bg-accent/20 border-2 border-accent' : 'bg-card border-2 border-border hover:border-primary/30'
                     }`}>
