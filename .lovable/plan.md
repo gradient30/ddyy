@@ -1,109 +1,158 @@
 
-# Fix Speech Synchronization + Enhance Interactivity
 
-## Problem 1: Speech Sync (Chinese cuts off before English starts)
+# Optimization Plan: Visual Fidelity, Factory Bug Fix, and Performance
 
-**Root Cause**: `WelcomePage.tsx` uses fixed `setTimeout` intervals (800ms, 3500ms, 6000ms, 9000ms, 11500ms) instead of waiting for each speech to actually finish. The `speak()` function already returns a Promise, but it's being ignored.
-
-**The same pattern exists in**: `StoryPage.tsx` (line 144 - fires speech without waiting), and other pages where bilingual content plays.
-
-### Fix Approach
-- Rewrite the WelcomePage intro sequence to use **Promise chaining** instead of fixed timeouts: speak Chinese -> wait for it to end -> then speak English -> wait -> then next phase
-- Apply the same pattern wherever bilingual speech is used across pages
-- Add a small 300ms gap between languages for natural pacing
-
-### Files to Change
-- `src/lib/speech.ts` - Add a `delay()` helper and improve `speakBilingual` with a gap
-- `src/pages/WelcomePage.tsx` - Replace setTimeout chain with async/await speech sequence
-- `src/pages/StoryPage.tsx` - Ensure story narration waits for completion
-- `src/pages/WorldTourPage.tsx` - CountryCard `handleListen` already chains correctly, but add gap
+This plan addresses 7 issues: unique barrier SVGs for World Tour, richer Traffic/Lab content, Factory tutorial bug fix, Language image matching, Coloring template accuracy, Treasure scene realism, and overall performance optimization.
 
 ---
 
-## Problem 2: Enhance Interactivity & Thinking
+## Issue 1: World Tour - All Barriers Look the Same
 
-Current modules are somewhat passive (click to reveal, simple matching). Here are concrete enhancements per module:
+**Problem**: `BarrierSVG` component (line 45-58) renders an identical straight-arm barrier for all 15 countries, ignoring each country's unique barrier type (folding arm, bollard, railway gate, fence, etc.).
 
-### A. Language Magic House - Add "Spell It" drag-and-drop mode
-- New mode: given a picture, drag pinyin/letters to spell the word in correct order
-- Shuffled letter tiles that children must arrange, promoting active recall
+**Fix**: Replace the single generic `BarrierSVG` with a `CountryBarrierSVG` component that renders a unique SVG shape per country based on `country.id`. Each country will have a distinct, recognizable barrier shape:
 
-### B. Traffic Hero City - Add "Why?" thinking prompts
-- After each correct answer, ask a follow-up "why" question (e.g., "Why do we stop at red?") with 2 choices
-- Rewards deeper thinking, not just pattern matching
+- **China (cn)**: Straight arm with red/white stripes - standard community barrier
+- **USA (us)**: Straight arm with LED screen panel on the pillar
+- **Japan (jp)**: Folding arm (two-segment arm with a hinge in the middle)
+- **Australia (au)**: Straight arm with solar panel on top of pillar
+- **Germany (de)**: Fence/grid barrier (multiple vertical bars instead of single arm)
+- **Kenya (ke)**: Simple wooden manual pole on a pivot
+- **UAE (ae)**: Flip-gate / turnstile style (rectangular panels)
+- **Brazil (br)**: Straight arm with rainbow/colorful stripes
+- **India (in)**: Railway crossing gate (X-shaped double arm)
+- **France (fr)**: Rising bollard (cylinder rising from ground)
+- **South Korea (kr)**: Straight arm with camera on top
+- **Egypt (eg)**: Ornamental/decorated pillar with arm
+- **Canada (ca)**: Straight arm with heating coil indicators (glow effect)
+- **Singapore (sg)**: ERP gantry arch with electronic display
+- **Mexico (mx)**: Community swing gate (two-panel gate)
 
-### C. Science Lab - Add "Predict First" step
-- Before each experiment result, ask kids to predict what will happen (2-3 choices)
-- Show result after prediction, compare - teaches scientific method
-
-### D. Treasure Hunt - Add assembly step after finding parts
-- After finding all parts in a level, add a drag-to-correct-slot assembly mini-game
-- Kids must figure out where each part goes on a barrier diagram
-
-### E. Story Kingdom - Add "What happens next?" pause
-- Before revealing the next scene, briefly show a thinking prompt
-- Add a "draw/describe" free moment between story beats
-
-### F. World Tour - Add quiz after each country
-- After viewing a country card, ask one quick question about what they learned (e.g., "What powers Australia's barrier?")
-- Must answer correctly to collect the stamp
-
-### Files to Change
-- `src/pages/LanguagePage.tsx` - Add SpellMode component
-- `src/pages/TrafficPage.tsx` - Add "why" follow-up after correct answers
-- `src/pages/LabPage.tsx` - Add prediction step before experiments
-- `src/pages/TreasurePage.tsx` - Add assembly mini-game after finding parts
-- `src/pages/WorldTourPage.tsx` - Add quiz question in CountryCard
-- `src/pages/StoryPage.tsx` - Add thinking pause between story nodes
+**File**: `src/pages/WorldTourPage.tsx`
 
 ---
 
-## Technical Details
+## Issue 2: Traffic Hero City and Science Lab - Enrich Content
 
-### Speech sync fix (speech.ts)
-```text
-// Add gap helper
-export function speakBilingual(zh, en, rate = 0.8): Promise<void> {
-  return speak(zh, 'zh-CN', rate)
-    .then(() => new Promise(r => setTimeout(r, 400)))  // natural pause
-    .then(() => speak(en, 'en-US', rate));
-}
-```
+**Problem**: Scenes use minimal emoji-based visuals and lack immersive backgrounds.
 
-### WelcomePage async sequence
-```text
-// Replace setTimeout chain with:
-useEffect(() => {
-  let cancelled = false;
-  async function runIntro() {
-    await delay(800);
-    if (cancelled) return;
-    setPhase('greeting'); ...
-    await speak(greetingsZh[greetIdx], 'zh-CN', 0.85);
-    if (cancelled) return;
-    setShowSubtitle(greetingsEn[greetIdx]);
-    await speak(greetingsEn[greetIdx], 'en-US', 0.8);
-    if (cancelled) return;
-    // ... continue chaining
-  }
-  runIntro();
-  return () => { cancelled = true; stopSpeaking(); };
-}, []);
-```
+**Fix**:
+- **Traffic Hero City**: Add detailed SVG scene backgrounds for each level:
+  - Level 1 (Parking): Draw a parking lot with lane markings, other parked cars, barrier, trees
+  - Level 2 (Traffic Light): Add road intersection with crosswalks, buildings, pedestrians
+  - Level 3 (Count Cars): Add a road scene with varied vehicle SVGs instead of just emoji
+  - Level 4 (Crosswalk): Draw a proper road with zebra crossing, traffic lights, buildings
+  - Level 5 (Driving): Add road lane markings, scenery elements on sides
+  - Add more "why" questions with 3 options instead of 2
 
-### Interactivity enhancement pattern
-Each enhancement follows: **Predict/Think -> Act -> Feedback -> Reflect**
+- **Science Lab**: Enhance SVG diagrams:
+  - Exp 1 (Anatomy): More detailed barrier SVG with labeled callout lines
+  - Exp 2 (Lever): Add fulcrum triangle, distance markers, force arrows
+  - Exp 3 (Motor/Solar): Add sun rays animation, wire connections between components
+  - Exp 4 (Sensor): Add car approaching scene, infrared beam visualization
 
-For example, Lab prediction step:
-```text
-// Before experiment starts, show:
-"What do you think will happen if we move the weight further?" 
-  [A] Easier to lift  [B] Harder to lift
-// Then run experiment, show if prediction was right
-// Bonus star for correct prediction
-```
+**Files**: `src/pages/TrafficPage.tsx`, `src/pages/LabPage.tsx`
+
+---
+
+## Issue 3: Factory - Tutorial Mode Bug
+
+**Problem**: When user clicks "Tutorial Mode", it sets `mode='tutorial'` but the type selection screen condition (line 224) checks `tutorialStep === 0 && Object.keys(slots).length === 0`. After selecting a barrier type, `handleStartTutorial` sets `tutorialStep = 0` and `slots = {}`, but immediately calls `speak()` which is fine. The real issue: after `handleStartTutorial` runs, `tutorialStep` is still 0 and `slots` is still empty (the state hasn't rendered the first step's install). The tutorial step view (line 240) checks `tutorialStep > 0 || Object.keys(slots).length > 0` - since both are 0/empty after `handleStartTutorial`, the type selection re-appears instead of the first build step.
+
+**Fix**: Add a new state `typeSelected` (boolean) to track whether the user has selected a barrier type. Change the conditions:
+- Show type selection: `mode === 'tutorial' && !typeSelected`
+- Show build steps: `mode === 'tutorial' && typeSelected`
+
+This ensures the first step (step 0 with empty slots) is properly shown after type selection.
+
+**File**: `src/pages/FactoryPage.tsx`
+
+---
+
+## Issue 4: Language Magic House - Image-Question Matching
+
+**Problem**: The VOCAB data uses generic emoji (e.g., car emoji for "car") which don't match contextually. The match game sometimes shows confusing prompts.
+
+**Fix**:
+- Improve emoji selections to be more visually distinct and recognizable for each word
+- Add a `hint` field to each word for contextual cues
+- When showing "find the picture for this Chinese character", display the character in a more prominent card with pinyin hint
+- When matching emoji to word, ensure the 4 options are from different categories to avoid confusion (e.g., don't show 4 color emojis together when matching by emoji)
+
+**File**: `src/pages/LanguagePage.tsx`
+
+---
+
+## Issue 5: Coloring Factory - Templates Don't Match Descriptions
+
+**Problem**: The `drawBarrierTemplate` function (line 39-111) only draws 3 variations (straight, folding, fence) but has 10 templates including solar, railway, bollard, cute, robot, tree, rocket. The remaining 7 all fall through to the default straight arm.
+
+**Fix**: Add unique canvas drawing logic for each of the 10 templates:
+- **solar**: Straight arm + solar panel rectangle on pillar top
+- **railway**: X-shaped double arm crossing gate
+- **bollard**: Cylinder rising from ground (no arm)
+- **cute**: Barrier with bunny ear decorations on pillar
+- **robot**: Barrier shaped like a robot with LED eyes
+- **tree**: Barrier arm styled as tree branch, pillar as trunk
+- **rocket**: Pillar shaped like a rocket, arm as exhaust trail
+
+**File**: `src/pages/ColoringPage.tsx`
+
+---
+
+## Issue 6: Treasure Hunt - Scene/Image Realism
+
+**Problem**: Scenes use scattered emoji as backgrounds, parts are generic emoji (bolt, gear, spring). The connection between the scene description and visual is weak.
+
+**Fix**:
+- Replace emoji-scatter backgrounds with SVG-drawn scenes:
+  - Level 1 (Parking lot): Draw cars, lanes, barrier outline, buildings
+  - Level 2 (Mall basement): Draw pillars, dim lighting, parked cars
+  - Level 3 (School gate): Draw school building, fence, trees
+  - Level 4 (Park entrance): Draw trees, path, flowers
+  - Level 5 (Highway toll): Draw road lanes, toll booth structures
+- Make hidden parts semi-transparent and blend into scenes (e.g., bolt near barrier base, gear near motor area)
+- Improve part names and descriptions to match their scene context
+
+**File**: `src/pages/TreasurePage.tsx`
+
+---
+
+## Issue 7: Performance Optimization
+
+**Problem**: Application lag, likely caused by:
+1. Animations running constantly (`animate-float`, `animate-glow-pulse`) on many elements
+2. Level 5 Driving game uses `setInterval(100ms)` causing rapid re-renders
+3. Multiple SVG components re-rendering unnecessarily
+4. Large page components not code-split
+
+**Fix**:
+- **Memoize SVG components**: Wrap all barrier SVG components and scene backgrounds with `React.memo`
+- **Optimize intervals**: Increase Level 5 driving interval from 100ms to 150ms, use `requestAnimationFrame` where possible
+- **Reduce animation overhead**: Use `will-change: transform` on animated elements, reduce number of simultaneous CSS animations on map page
+- **Lazy load pages**: Use `React.lazy` + `Suspense` for all page routes in `App.tsx`
+- **Stabilize callbacks**: Ensure `useCallback` is used consistently for event handlers passed as props
+- **Debounce drag handlers**: Add throttling to drag/touch handlers in parking and lever experiments
+
+**Files**: `src/App.tsx`, `src/pages/TrafficPage.tsx`, `src/components/map/IslandMap.tsx`, and all page files for `React.memo` wrapping
+
+---
 
 ## Implementation Order
-1. Fix speech.ts and WelcomePage sync (highest priority - user-reported bug)
-2. Apply sync fix to all other pages
-3. Add interactivity enhancements to each module (can be done in parallel)
+
+1. Fix Factory tutorial bug (quick fix, highest user impact)
+2. Performance optimizations (lazy loading, memoization)
+3. World Tour unique barrier SVGs (15 distinct drawings)
+4. Coloring Factory template drawings (7 new templates)
+5. Traffic Hero City SVG scene backgrounds
+6. Science Lab enhanced diagrams
+7. Treasure Hunt SVG scenes
+8. Language House matching improvements
+
+## Technical Notes
+
+- All visuals remain pure SVG/CSS (no external images per architecture constraint)
+- Each country's barrier SVG will be 60-80 lines of SVG paths, kept in a helper function to avoid bloating the main component
+- Lazy loading uses `React.lazy(() => import('./pages/XxxPage'))` pattern with a simple loading spinner fallback
+- `React.memo` will be applied to all sub-components that receive stable props
+
