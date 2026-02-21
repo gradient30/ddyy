@@ -34,67 +34,80 @@ const funFacts = [
 const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
   const { currentProfile, addStars } = useGame();
-  const [phase, setPhase] = useState<'intro' | 'greeting' | 'fact' | 'ready'>('intro');
+  const [phase, setPhase] = useState<'tap-to-start' | 'intro' | 'greeting' | 'fact' | 'ready'>('tap-to-start');
   const [greetIdx] = useState(() => Math.floor(Math.random() * greetingsZh.length));
   const [factIdx] = useState(() => Math.floor(Math.random() * funFacts.length));
   const [mascotMood, setMascotMood] = useState<'happy' | 'excited' | 'waving'>('waving');
   const [showSubtitle, setShowSubtitle] = useState('');
+  const cancelledRef = React.useRef(false);
+
+  const runIntro = async () => {
+    cancelledRef.current = false;
+
+    setPhase('intro');
+    await delay(400);
+    if (cancelledRef.current) return;
+
+    // Phase 1: Greeting
+    setPhase('greeting');
+    setMascotMood('waving');
+    setShowSubtitle(greetingsZh[greetIdx]);
+    await speak(greetingsZh[greetIdx], 'zh-CN', 0.85);
+    if (cancelledRef.current) return;
+
+    await delay(400);
+    if (cancelledRef.current) return;
+
+    setShowSubtitle(greetingsEn[greetIdx]);
+    await speak(greetingsEn[greetIdx], 'en-US', 0.8);
+    if (cancelledRef.current) return;
+
+    await delay(500);
+    if (cancelledRef.current) return;
+
+    // Phase 2: Fun fact
+    setPhase('fact');
+    setMascotMood('excited');
+    const fact = funFacts[factIdx];
+    setShowSubtitle(fact.zh);
+    await speak(fact.zh, 'zh-CN', 0.85);
+    if (cancelledRef.current) return;
+
+    await delay(400);
+    if (cancelledRef.current) return;
+
+    setShowSubtitle(fact.en);
+    await speak(fact.en, 'en-US', 0.8);
+    if (cancelledRef.current) return;
+
+    await delay(500);
+    if (cancelledRef.current) return;
+
+    // Phase 3: Ready
+    setPhase('ready');
+    setMascotMood('happy');
+    setShowSubtitle('准备好了吗？出发探险啦！');
+    playSuccess();
+  };
+
+  // 用户点击后才开始语音引导（移动端必须在用户手势中触发语音）
+  const handleTapToStart = () => {
+    playClick();
+    // 在用户手势中同步触发一次静音语音，解锁移动端 TTS
+    if ('speechSynthesis' in window) {
+      const u = new SpeechSynthesisUtterance('');
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+    }
+    runIntro();
+  };
 
   useEffect(() => {
-    let cancelled = false;
-
-    async function runIntro() {
-      await delay(800);
-      if (cancelled) return;
-
-      // Phase 1: Greeting
-      setPhase('greeting');
-      setMascotMood('waving');
-      setShowSubtitle(greetingsZh[greetIdx]);
-      await speak(greetingsZh[greetIdx], 'zh-CN', 0.85);
-      if (cancelled) return;
-
-      await delay(400);
-      if (cancelled) return;
-
-      setShowSubtitle(greetingsEn[greetIdx]);
-      await speak(greetingsEn[greetIdx], 'en-US', 0.8);
-      if (cancelled) return;
-
-      await delay(500);
-      if (cancelled) return;
-
-      // Phase 2: Fun fact
-      setPhase('fact');
-      setMascotMood('excited');
-      const fact = funFacts[factIdx];
-      setShowSubtitle(fact.zh);
-      await speak(fact.zh, 'zh-CN', 0.85);
-      if (cancelled) return;
-
-      await delay(400);
-      if (cancelled) return;
-
-      setShowSubtitle(fact.en);
-      await speak(fact.en, 'en-US', 0.8);
-      if (cancelled) return;
-
-      await delay(500);
-      if (cancelled) return;
-
-      // Phase 3: Ready
-      setPhase('ready');
-      setMascotMood('happy');
-      setShowSubtitle('准备好了吗？出发探险啦！');
-      playSuccess();
-    }
-
-    runIntro();
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
       stopSpeaking();
     };
-  }, [greetIdx, factIdx]);
+  }, []);
 
   const handleExplore = () => {
     playClick();
@@ -124,6 +137,20 @@ const WelcomePage: React.FC = () => {
         <div className="relative bg-card rounded-3xl shadow-lg p-6 max-w-md w-full text-center mb-6 animate-pop-in" style={{ animationDelay: '0.3s' }}>
           {/* 三角箭头 */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-card rotate-45 rounded-sm" />
+
+          {phase === 'tap-to-start' && (
+            <div className="py-6">
+              <div className="text-5xl mb-3 animate-bounce-gentle">👋</div>
+              <p className="text-2xl font-black text-foreground mb-2">嗨！小朋友！</p>
+              <p className="text-base text-muted-foreground mb-4">点击下面按钮，小闸闸要跟你说话啦！</p>
+              <button
+                onClick={handleTapToStart}
+                className="touch-target rounded-3xl bg-gradient-to-r from-sky to-grass text-primary-foreground px-8 py-4 text-2xl font-black shadow-lg hover:scale-105 active:scale-95 transition-all animate-pulse"
+              >
+                🔊 点我开始！
+              </button>
+            </div>
+          )}
 
           {phase === 'intro' && (
             <div className="py-8">
