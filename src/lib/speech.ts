@@ -1,4 +1,29 @@
-// 道闸乐园 - Web Speech API 语音合成
+// 道闸乐园 - Web Speech API 语音合成（含移动端解锁）
+
+let speechUnlocked = false;
+
+/** 在首次用户点击时解锁语音合成（移动端必须） */
+function unlockSpeech() {
+  if (speechUnlocked) return;
+  if (!('speechSynthesis' in window)) return;
+  const u = new SpeechSynthesisUtterance('');
+  u.volume = 0;
+  window.speechSynthesis.speak(u);
+  speechUnlocked = true;
+}
+
+// 监听首次用户交互来解锁
+if (typeof window !== 'undefined') {
+  const unlock = () => {
+    unlockSpeech();
+    window.removeEventListener('pointerdown', unlock);
+    window.removeEventListener('touchstart', unlock);
+    window.removeEventListener('click', unlock);
+  };
+  window.addEventListener('pointerdown', unlock, { once: true });
+  window.addEventListener('touchstart', unlock, { once: true });
+  window.addEventListener('click', unlock, { once: true });
+}
 
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
