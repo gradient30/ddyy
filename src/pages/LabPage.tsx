@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import GlobalNav from '@/components/nav/GlobalNav';
 import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { useGame } from '@/contexts/GameContext';
 import { playClick, playSuccess, playError, playBarrierLift, vibrate } from '@/lib/sound';
-import { speak } from '@/lib/speech';
+import { speak, speakBilingual, delay } from '@/lib/speech';
 import { AnatomyDiagram, LeverDiagram, SolarMotorDiagram, SensorDiagram } from '@/components/scenes/LabScenes';
 
 // ===================== PREDICTION COMPONENT =====================
@@ -15,6 +15,10 @@ const PredictionStep: React.FC<{
 }> = ({ question, options, onDone }) => {
   const [picked, setPicked] = useState<number | null>(null);
   const [result, setResult] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    speak(`先猜一猜！${question}`);
+  }, [question]);
 
   const handlePick = (idx: number) => {
     playClick();
@@ -84,6 +88,10 @@ const Exp1Anatomy: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [explored, setExplored] = useState<Set<string>>(new Set());
 
+  useEffect(() => {
+    speak('点击道闸的每个部位，认识道闸的身体吧！');
+  }, []);
+
   const parts = [
     { id: 'arm', label: '杆臂', labelEn: 'Arm (Lever)', x: 55, y: 15, desc: '杠杆手臂，用来挡住车辆', emoji: '💪' },
     { id: 'motor', label: '电机', labelEn: 'Motor', x: 35, y: 55, desc: '轮轴心脏，让杆臂上下运动', emoji: '⚙️' },
@@ -144,6 +152,10 @@ const Exp2Lever: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [weightPos, setWeightPos] = useState(30);
   const [done, setDone] = useState(false);
 
+  useEffect(() => {
+    speak('用手指拖动重物，往右边移动，看看会怎样？');
+  }, []);
+
   const tilt = (weightPos - 50) * 0.4;
   const effortNeeded = Math.max(10, 100 - weightPos);
 
@@ -192,6 +204,10 @@ const Exp3MotorSolar: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
   const [spinning, setSpinning] = useState(false);
   const [charged, setCharged] = useState(0);
   const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    speak('点击太阳，给电池充电！看看电机能不能转起来？');
+  }, []);
 
   const handleSunClick = () => {
     if (done) return;
@@ -246,6 +262,10 @@ const Exp4Sensor: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [barrierUp, setBarrierUp] = useState(true);
   const [trialCount, setTrialCount] = useState(0);
   const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    speak('试试点挡住按钮，看看道闸会怎样？');
+  }, []);
 
   const handleBlock = () => {
     if (done) return;
@@ -311,8 +331,15 @@ const LabPage: React.FC = () => {
   const [showPrediction, setShowPrediction] = useState(true);
   const [predictionBonus, setPredictionBonus] = useState(0);
 
+  // Narrate page on mount
+  useEffect(() => {
+    speak('欢迎来到探秘实验室！选一个实验开始探索吧！');
+  }, []);
+
   const handleStartExp = (expId: number) => {
     playClick();
+    const exp = EXPERIMENTS[expId - 1];
+    speak(`${exp.title}。${exp.desc}`);
     setCurrentExp(expId);
     setShowPrediction(true);
   };
