@@ -165,3 +165,52 @@
   min-height: 70px;
   @apply flex items-center justify-center cursor-pointer select-none;
 }
+
+/* 高对比度模式 */
+.high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 100%;
+  --primary: 54 100% 55%;
+  --primary-foreground: 0 0% 0%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 75%;
+  --border: 0 0% 30%;
+  --accent: 142 100% 50%;
+  --accent-foreground: 0 0% 0%;
+}
+
+.high-contrast * {
+  border-width: 2px !important;
+  font-weight: 700 !important;
+}
+
+/* 减少动画 - 无障碍 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 屏幕阅读器辅助 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 焦点可见性 - 键盘导航 */
+:focus-visible {
+  outline: 3px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
