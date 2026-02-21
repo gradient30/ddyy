@@ -1,111 +1,109 @@
 
+# Fix Speech Synchronization + Enhance Interactivity
 
-# 🚧 道闸乐园（Barrier Buddies Adventure）
-## 学前儿童教育 Web 应用 — 完整实施计划
+## Problem 1: Speech Sync (Chinese cuts off before English starts)
 
----
+**Root Cause**: `WelcomePage.tsx` uses fixed `setTimeout` intervals (800ms, 3500ms, 6000ms, 9000ms, 11500ms) instead of waiting for each speech to actually finish. The `speak()` function already returns a Promise, but it's being ignored.
 
-## 🎯 项目愿景
-以4-7岁孩子最爱的"道闸"为兴趣引擎，通过丰富的SVG动画、CSS动效和互动游戏，让孩子在玩耍中学习交通安全、STEM启蒙和语言知识。全离线、零广告、视力保护。
+**The same pattern exists in**: `StoryPage.tsx` (line 144 - fires speech without waiting), and other pages where bilingual content plays.
 
----
+### Fix Approach
+- Rewrite the WelcomePage intro sequence to use **Promise chaining** instead of fixed timeouts: speak Chinese -> wait for it to end -> then speak English -> wait -> then next phase
+- Apply the same pattern wherever bilingual speech is used across pages
+- Add a small 300ms gap between languages for natural pacing
 
-## 📐 整体架构
-
-### 视觉风格
-- 配色：天空蓝 #00BFFF、金黄 #FFEA00、草绿 #4ADE80、橙红 #FF6B6B
-- 全部图形使用 SVG + CSS 动画代码生成（卡通风格）
-- 吉祥物"小闸闸"：SVG 卡通道闸角色，多种表情状态
-- 超大圆角、≥70px触摸区、高对比度
-
-### 数据存储
-- localStorage 存储进度、星星、徽章、设置
-- 支持3个孩子档案切换
-- 无需任何后端或网络连接
-
-### 全局系统
-- 15分钟使用计时器 + 彩虹进度条
-- 强制10分钟休息（眼保健操动画）
-- 小闸闸语音助手（Web Speech API）
-- 星星奖励系统 + 徽章收集
-- 大字幕同步显示
+### Files to Change
+- `src/lib/speech.ts` - Add a `delay()` helper and improve `speakBilingual` with a gap
+- `src/pages/WelcomePage.tsx` - Replace setTimeout chain with async/await speech sequence
+- `src/pages/StoryPage.tsx` - Ensure story narration waits for completion
+- `src/pages/WorldTourPage.tsx` - CountryCard `handleListen` already chains correctly, but add gap
 
 ---
 
-## 🏗️ 分阶段实施
+## Problem 2: Enhance Interactivity & Thinking
 
-### 第一阶段：核心框架 + 首页地图
-- 卡通游乐园大地图首页（SVG绘制10个主题岛）
-- 小闸闸角色系统（SVG + CSS动画表情）
-- 全局导航：回家按钮、计时进度条、语音助手
-- 15分钟计时 + 休息小屋（眼保健操）
-- 档案选择界面（3个孩子头像）
-- 星星/徽章奖励系统框架
-- Web Speech API 语音合成（中英双语）
+Current modules are somewhat passive (click to reveal, simple matching). Here are concrete enhancements per module:
 
-### 第二阶段：欢迎岛 + 世界巡游岛
-- **欢迎岛**：开场动画 + 小闸闸自我介绍 + 每日随机问候
-- **世界巡游岛**：
-  - 可旋转互动地球仪（SVG）
-  - 15个国家道闸翻转大卡片（大图 + 升降动画 + 语音介绍）
-  - 中国直臂闸、美国广告屏闸、日本折臂闸、澳大利亚太阳能闸等
-  - 集齐15国解锁"环球小旅行家"徽章
+### A. Language Magic House - Add "Spell It" drag-and-drop mode
+- New mode: given a picture, drag pinyin/letters to spell the word in correct order
+- Shuffled letter tiles that children must arrange, promoting active recall
 
-### 第三阶段：建造工厂 + 涂色工厂
-- **建造工厂**：
-  - 教学模式：5-8步引导拖拽组装道闸
-  - 自由建造：20+零件库，3种道闸类型
-  - 组装完成后"试运行"升降动画
-  - 正确率反馈 + 星星奖励
-- **涂色工厂**：
-  - Canvas 涂色画板，10种道闸模板
-  - 调色盘 + 贴纸装饰
-  - 作品保存到收藏馆
+### B. Traffic Hero City - Add "Why?" thinking prompts
+- After each correct answer, ask a follow-up "why" question (e.g., "Why do we stop at red?") with 2 choices
+- Rewards deeper thinking, not just pattern matching
 
-### 第四阶段：交通英雄城
-- 5关游戏场景（SVG场景 + CSS动画）：
-  - 第1关：拖车入停车位 + 升杆
-  - 第2关：红绿灯选择判断
-  - 第3关：数车计数（1-20）
-  - 第4关：帮小动物过斑马线（天气切换）
-  - 第5关：倾斜手机模拟开车（DeviceOrientation，可关闭）
-- 每关嵌入交通规则 + 汉字/英语词汇
+### C. Science Lab - Add "Predict First" step
+- Before each experiment result, ask kids to predict what will happen (2-3 choices)
+- Show result after prediction, compare - teaches scientific method
 
-### 第五阶段：探秘实验室
-- 4大拆解动画（SVG交互式分解图）：
-  - 道闸部位点击放大学习
-  - 杠杆原理虚拟实验（拖动重物）
-  - 电机 + 太阳能动画演示
-  - 传感器红外线安全演示
-- 4个微型STEM实验（拖拽组装简单机器）
+### D. Treasure Hunt - Add assembly step after finding parts
+- After finding all parts in a level, add a drag-to-correct-slot assembly mini-game
+- Kids must figure out where each part goes on a barrier diagram
 
-### 第六阶段：语言魔法屋
-- 图片-汉字-字母-英语 四连匹配游戏
-- 跟读录音回放（SpeechRecognition API）
-- 全应用物体点击弹出词汇学习
-- 50+词汇库覆盖所有模块
+### E. Story Kingdom - Add "What happens next?" pause
+- Before revealing the next scene, briefly show a thinking prompt
+- Add a "draw/describe" free moment between story beats
 
-### 第七阶段：音乐 + 故事 + 寻宝
-- **音乐律动场**：敲击节奏控制道闸升降，Web Audio API生成音效
-- **故事王国**：5个互动分支绘本（选择影响结局）
-- **寻宝乐园**：停车场大场景找隐藏零件（10关拼图）
+### F. World Tour - Add quiz after each country
+- After viewing a country card, ask one quick question about what they learned (e.g., "What powers Australia's barrier?")
+- Must answer correctly to collect the stamp
 
-### 第八阶段：收藏馆 + 家长区 + 完善
-- **我的收藏馆**：徽章墙（20种）、作品展、星星统计、分享生成图片
-- **家长区**（密码1234）：
-  - 使用时长统计、已学词汇清单（带发音）
-  - 作品库浏览、星星报告图表
-  - 设置：休息时长、语音语言、导出数据
-- 难度自适应系统（根据成功率调整）
-- 高对比/色盲模式、屏幕阅读器支持
-- PWA 配置（离线缓存、安装提示）
+### Files to Change
+- `src/pages/LanguagePage.tsx` - Add SpellMode component
+- `src/pages/TrafficPage.tsx` - Add "why" follow-up after correct answers
+- `src/pages/LabPage.tsx` - Add prediction step before experiments
+- `src/pages/TreasurePage.tsx` - Add assembly mini-game after finding parts
+- `src/pages/WorldTourPage.tsx` - Add quiz question in CountryCard
+- `src/pages/StoryPage.tsx` - Add thinking pause between story nodes
 
 ---
 
-## ⚠️ 实施说明
-- 所有图形资源均使用 SVG + CSS 动画代码生成，卡通风格
-- 语音使用浏览器内置 Web Speech API（中英双语），无需外部服务
-- 音效使用 Web Audio API 程序化生成
-- 由于项目规模较大，每个阶段会是多轮对话逐步构建
-- 建议每完成一个阶段进行测试验收后再进入下一阶段
+## Technical Details
 
+### Speech sync fix (speech.ts)
+```text
+// Add gap helper
+export function speakBilingual(zh, en, rate = 0.8): Promise<void> {
+  return speak(zh, 'zh-CN', rate)
+    .then(() => new Promise(r => setTimeout(r, 400)))  // natural pause
+    .then(() => speak(en, 'en-US', rate));
+}
+```
+
+### WelcomePage async sequence
+```text
+// Replace setTimeout chain with:
+useEffect(() => {
+  let cancelled = false;
+  async function runIntro() {
+    await delay(800);
+    if (cancelled) return;
+    setPhase('greeting'); ...
+    await speak(greetingsZh[greetIdx], 'zh-CN', 0.85);
+    if (cancelled) return;
+    setShowSubtitle(greetingsEn[greetIdx]);
+    await speak(greetingsEn[greetIdx], 'en-US', 0.8);
+    if (cancelled) return;
+    // ... continue chaining
+  }
+  runIntro();
+  return () => { cancelled = true; stopSpeaking(); };
+}, []);
+```
+
+### Interactivity enhancement pattern
+Each enhancement follows: **Predict/Think -> Act -> Feedback -> Reflect**
+
+For example, Lab prediction step:
+```text
+// Before experiment starts, show:
+"What do you think will happen if we move the weight further?" 
+  [A] Easier to lift  [B] Harder to lift
+// Then run experiment, show if prediction was right
+// Bonus star for correct prediction
+```
+
+## Implementation Order
+1. Fix speech.ts and WelcomePage sync (highest priority - user-reported bug)
+2. Apply sync fix to all other pages
+3. Add interactivity enhancements to each module (can be done in parallel)
