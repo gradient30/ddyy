@@ -31,7 +31,7 @@ const islands: IslandData[] = [
 const IslandButton: React.FC<{ island: IslandData; onClick: () => void }> = ({ island, onClick }) => (
   <button
     onClick={onClick}
-    className={`touch-target absolute animate-pop-in flex flex-col items-center gap-1 p-3 rounded-3xl bg-gradient-to-br ${island.color} shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 border-4 border-card/50 hover:border-card`}
+    className={`touch-target absolute animate-pop-in flex flex-col items-center gap-1 p-3 md:p-4 lg:p-5 rounded-3xl bg-gradient-to-br ${island.color} shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 border-4 border-card/50 hover:border-card`}
     style={{
       left: `${island.x}%`,
       top: `${island.y}%`,
@@ -40,8 +40,8 @@ const IslandButton: React.FC<{ island: IslandData; onClick: () => void }> = ({ i
     }}
     aria-label={island.name}
   >
-    <span className="text-3xl md:text-4xl">{island.emoji}</span>
-    <span className="text-xs md:text-sm font-bold text-card whitespace-nowrap drop-shadow-sm">{island.name}</span>
+    <span className="text-3xl md:text-5xl">{island.emoji}</span>
+    <span className="text-xs md:text-base font-bold text-card whitespace-nowrap drop-shadow-sm">{island.name}</span>
   </button>
 );
 
@@ -54,15 +54,15 @@ const IslandMap: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky/30 via-background to-grass/20 pt-16 pb-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-sky/30 via-background to-grass/20 pt-16 pb-8 px-4 flex flex-col">
       {/* 标题 */}
-      <div className="text-center mb-4">
-        <h1 className="text-3xl md:text-4xl font-black text-foreground">🚧 道闸游乐园 🎡</h1>
-        <p className="text-sm text-muted-foreground mt-1">点击小岛开始探险吧！</p>
+      <div className="text-center mb-2 md:mb-4">
+        <h1 className="text-3xl md:text-5xl font-black text-foreground">🚧 道闸游乐园 🎡</h1>
+        <p className="text-sm md:text-lg text-muted-foreground mt-1">点击小岛开始探险吧！</p>
       </div>
 
       {/* 地图区域 */}
-      <div className="relative w-full max-w-2xl mx-auto" style={{ height: '65vh', minHeight: '450px' }}>
+      <div className="relative w-full max-w-2xl md:max-w-4xl mx-auto flex-1" style={{ minHeight: '450px' }}>
         {/* 背景装饰 */}
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
           {/* 连接线 */}
@@ -82,16 +82,16 @@ const IslandMap: React.FC = () => {
 
         {/* 小闸闸在中央 */}
         <div className="absolute animate-glow-pulse" style={{ left: '50%', top: '55%', transform: 'translate(-50%, -50%)' }}>
-          <XiaoZhaZha mood="happy" size={60} />
+          <XiaoZhaZha mood="happy" size={80} />
         </div>
       </div>
 
       {/* 底部快捷 */}
-      <div className="flex justify-center gap-4 mt-4">
-        <button onClick={() => { playClick(); navigate('/collection'); }} className="touch-target rounded-2xl bg-golden/20 hover:bg-golden/30 px-4 py-2 text-lg font-bold transition-all active:scale-95">
+      <div className="flex justify-center gap-4 md:gap-6 mt-4">
+        <button onClick={() => { playClick(); navigate('/collection'); }} className="touch-target rounded-2xl bg-golden/20 hover:bg-golden/30 px-4 md:px-6 py-2 md:py-3 text-lg md:text-xl font-bold transition-all active:scale-95">
           🏆 收藏馆
         </button>
-        <button onClick={() => { playClick(); navigate('/parent'); }} className="touch-target rounded-2xl bg-muted hover:bg-muted/80 px-4 py-2 text-lg font-bold transition-all active:scale-95">
+        <button onClick={() => { playClick(); navigate('/parent'); }} className="touch-target rounded-2xl bg-muted hover:bg-muted/80 px-4 md:px-6 py-2 md:py-3 text-lg md:text-xl font-bold transition-all active:scale-95">
           🔑 家长区
         </button>
       </div>
