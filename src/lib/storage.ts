@@ -1,9 +1,14 @@
 // 道闸乐园 - localStorage 数据管理
 
+// 年龄段类型
+type AgeGroup = 'toddler' | 'child';
+
 export interface ChildProfile {
   id: number;
   name: string;
   avatar: string; // emoji
+  ageGroup: AgeGroup; // 年龄段：幼儿版(toddler)或儿童版(child)
+  age?: number; // 可选的具体年龄（3-10）
   stars: number;
   badges: string[];
   learnedWords: string[];
@@ -15,6 +20,8 @@ export interface ChildProfile {
     language: 'zh' | 'en' | 'both';
     voiceSpeed: number;
     restDuration: number; // minutes
+    fontSize: 'normal' | 'large'; // 字体大小偏好
+    animationSpeed: 'slow' | 'normal'; // 动画速度偏好
   };
 }
 
@@ -27,6 +34,9 @@ export interface GameState {
     vibrationEnabled: boolean;
     highContrast: boolean;
     timerEnabled: boolean;
+    eyeCareMode: boolean; // 护眼模式
+    paperMode: boolean; // 纸质模式
+    colorBlindMode: boolean; // 色盲友好模式
   };
 }
 
@@ -36,6 +46,7 @@ const defaultProfile = (id: number): ChildProfile => ({
   id,
   name: id === 1 ? '宝宝1' : id === 2 ? '宝宝2' : '宝宝3',
   avatar: id === 1 ? '🦁' : id === 2 ? '🐰' : '🐻',
+  ageGroup: 'child', // 默认为儿童版
   stars: 0,
   badges: [],
   learnedWords: [],
@@ -47,6 +58,8 @@ const defaultProfile = (id: number): ChildProfile => ({
     language: 'both',
     voiceSpeed: 0.8,
     restDuration: 10,
+    fontSize: 'normal',
+    animationSpeed: 'normal',
   },
 });
 
@@ -59,6 +72,9 @@ const defaultState: GameState = {
     vibrationEnabled: true,
     highContrast: false,
     timerEnabled: true,
+    eyeCareMode: true, // 默认开启护眼模式
+    paperMode: false,
+    colorBlindMode: false,
   },
 };
 

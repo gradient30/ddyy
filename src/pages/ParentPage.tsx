@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGame } from '@/contexts/GameContext';
 import { useNavigate } from 'react-router-dom';
 import { playClick } from '@/lib/sound';
+import { ChildProfile, GameState, saveGameState } from '@/lib/storage';
 
 const CORRECT_PIN = '1234';
 
@@ -12,6 +13,8 @@ const ParentPage: React.FC = () => {
   const [authed, setAuthed] = useState(false);
   const [error, setError] = useState(false);
   const [tab, setTab] = useState<'overview' | 'words' | 'settings'>('overview');
+
+  const { profiles, globalSettings } = state;
 
   const handlePinSubmit = () => {
     if (pin === CORRECT_PIN) {
@@ -154,8 +157,39 @@ const ParentPage: React.FC = () => {
       {/* Settings */}
       {tab === 'settings' && (
         <div className="max-w-lg mx-auto space-y-4">
+          {/* 护眼与视觉设置 */}
           <div className="bg-card rounded-3xl p-5 border border-border shadow-lg space-y-4">
-            <h3 className="font-bold text-lg text-foreground">⚙️ 全局设置</h3>
+            <h3 className="font-bold text-lg text-foreground">👁️ 护眼与视觉</h3>
+
+            <SettingToggle
+              label="🌿 护眼模式"
+              description="暖白背景，减少蓝光"
+              value={globalSettings.eyeCareMode}
+              onChange={v => updateSettings({ eyeCareMode: v })}
+            />
+            <SettingToggle
+              label="📄 纸质模式"
+              description="模拟纸张阅读体验"
+              value={globalSettings.paperMode}
+              onChange={v => updateSettings({ paperMode: v })}
+            />
+            <SettingToggle
+              label="🔲 高对比度"
+              description="适合视力障碍用户"
+              value={globalSettings.highContrast}
+              onChange={v => updateSettings({ highContrast: v })}
+            />
+            <SettingToggle
+              label="🎨 色盲友好"
+              description="图案+颜色双重编码"
+              value={globalSettings.colorBlindMode}
+              onChange={v => updateSettings({ colorBlindMode: v })}
+            />
+          </div>
+
+          {/* 基础设置 */}
+          <div className="bg-card rounded-3xl p-5 border border-border shadow-lg space-y-4">
+            <h3 className="font-bold text-lg text-foreground">⚙️ 基础设置</h3>
 
             <SettingToggle
               label="🔊 音效"
@@ -173,15 +207,55 @@ const ParentPage: React.FC = () => {
               onChange={v => updateSettings({ vibrationEnabled: v })}
             />
             <SettingToggle
-              label="🔲 高对比度"
-              value={globalSettings.highContrast}
-              onChange={v => updateSettings({ highContrast: v })}
-            />
-            <SettingToggle
               label="⏰ 定时休息"
               value={globalSettings.timerEnabled}
               onChange={v => updateSettings({ timerEnabled: v })}
             />
+          </div>
+
+          {/* 个人档案年龄段设置 */}
+          <div className="bg-card rounded-3xl p-5 border border-border shadow-lg space-y-4">
+            <h3 className="font-bold text-lg text-foreground">👶 年龄段设置</h3>
+            {profiles.map(p => (
+              <div key={p.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{p.avatar}</span>
+                  <span className="font-medium">{p.name}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { 
+                      playClick(); 
+                      const newState = updateProfileAgeGroupInState(state, p.id, 'toddler');
+                      // 更新本地状态
+                      window.location.reload();
+                    }}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                      p.ageGroup === 'toddler' 
+                        ? 'bg-golden text-foreground' 
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    🧸 幼儿
+                  </button>
+                  <button
+                    onClick={() => { 
+                      playClick(); 
+                      const newState = updateProfileAgeGroupInState(state, p.id, 'child');
+                      // 更新本地状态
+                      window.location.reload();
+                    }}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                      p.ageGroup === 'child' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    🚀 儿童
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Data export */}
@@ -218,9 +292,17 @@ const MiniStat: React.FC<{ icon: string; value: number; label: string }> = ({ ic
   </div>
 );
 
-const SettingToggle: React.FC<{ label: string; value: boolean; onChange: (v: boolean) => void }> = ({ label, value, onChange }) => (
+const SettingToggle: React.FC<{ 
+  label: string; 
+  description?: string;
+  value: boolean; 
+  onChange: (v: boolean) => void 
+}> = ({ label, description, value, onChange }) => (
   <div className="flex items-center justify-between py-2 border-b border-border last:border-0">
-    <span className="font-bold text-foreground">{label}</span>
+    <div className="flex flex-col">
+      <span className="font-bold text-foreground">{label}</span>
+      {description && <span className="text-xs text-muted-foreground">{description}</span>}
+    </div>
     <button
       onClick={() => { playClick(); onChange(!value); }}
       className={`w-14 h-8 rounded-full transition-all relative ${value ? 'bg-primary' : 'bg-muted'}`}
@@ -229,5 +311,19 @@ const SettingToggle: React.FC<{ label: string; value: boolean; onChange: (v: boo
     </button>
   </div>
 );
+
+// 辅助函数：更新指定档案的年龄段
+function updateProfileAgeGroupInState(
+  state: GameState,
+  profileId: number,
+  ageGroup: 'toddler' | 'child'
+): GameState {
+  const profiles = state.profiles.map(p =>
+    p.id === profileId ? { ...p, ageGroup } : p
+  );
+  const newState = { ...state, profiles };
+  saveGameState(newState);
+  return newState;
+}
 
 export default ParentPage;

@@ -1,15 +1,38 @@
 {
   "name": "道闸乐园 Barrier Buddies",
   "short_name": "道闸乐园",
-  "description": "4-7岁儿童教育互动乐园",
+  "description": "4-10岁儿童教育互动乐园 - 护眼设计、分龄内容、完全免费",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f0f9ff",
-  "theme_color": "#00BFFF",
+  "background_color": "#FDFCF8",
+  "theme_color": "#5A9B8C",
+  "categories": ["education", "kids", "games"],
+  "lang": "zh-CN",
+  "dir": "ltr",
   "icons": [
     { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" },
-    { "src": "/favicon.ico", "sizes": "192x192", "type": "image/x-icon" },
-    { "src": "/favicon.ico", "sizes": "512x512", "type": "image/x-icon" }
-  ]
+    { "src": "/favicon.ico", "sizes": "192x192", "type": "image/x-icon", "purpose": "any maskable" },
+    { "src": "/favicon.ico", "sizes": "512x512", "type": "image/x-icon", "purpose": "any maskable" }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "道闸涂色",
+      "short_name": "涂色",
+      "description": "开始道闸涂色游戏",
+      "url": "/coloring",
+      "icons": [{ "src": "/favicon.ico", "sizes": "96x96" }]
+    },
+    {
+      "name": "益智游戏",
+      "short_name": "游戏",
+      "description": "开始益智游戏",
+      "url": "/lab",
+      "icons": [{ "src": "/favicon.ico", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }

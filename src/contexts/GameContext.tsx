@@ -10,6 +10,10 @@ interface GameContextType {
   addBadge: (badge: string) => void;
   addLearnedWord: (word: string) => void;
   updateSettings: (settings: Partial<GameState['globalSettings']>) => void;
+  // 年龄段相关
+  updateProfileAgeGroup: (ageGroup: 'toddler' | 'child') => void;
+  updateProfileSettings: (settings: Partial<ChildProfile['settings']>) => void;
+  isToddlerMode: boolean;
   // Timer
   timerSeconds: number;
   isResting: boolean;
@@ -69,6 +73,37 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // 更新年龄段
+  const updateProfileAgeGroup = useCallback((ageGroup: 'toddler' | 'child') => {
+    if (state.currentProfileId === null) return;
+    setState(prev => {
+      const profiles = prev.profiles.map(p =>
+        p.id === prev.currentProfileId ? { ...p, ageGroup } : p
+      );
+      const newState = { ...prev, profiles };
+      saveGameState(newState);
+      return newState;
+    });
+  }, [state.currentProfileId]);
+
+  // 更新个人设置
+  const updateProfileSettings = useCallback((settings: Partial<ChildProfile['settings']>) => {
+    if (state.currentProfileId === null) return;
+    setState(prev => {
+      const profiles = prev.profiles.map(p =>
+        p.id === prev.currentProfileId
+          ? { ...p, settings: { ...p.settings, ...settings } }
+          : p
+      );
+      const newState = { ...prev, profiles };
+      saveGameState(newState);
+      return newState;
+    });
+  }, [state.currentProfileId]);
+
+  // 是否幼儿模式
+  const isToddlerMode = currentProfile?.ageGroup === 'toddler';
+
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     setTimerSeconds(0);
@@ -126,6 +161,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     <GameContext.Provider value={{
       state, currentProfile, selectProfile, logout,
       addStars, addBadge, addLearnedWord, updateSettings,
+      updateProfileAgeGroup, updateProfileSettings, isToddlerMode,
       timerSeconds, isResting, restSeconds, startTimer, resetTimer,
     }}>
       {children}

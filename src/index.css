@@ -4,84 +4,123 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
+/**
+ * ========================================
+ * 道闸乐园 - 护眼配色系统 v1.0
+ * 设计理念：暖白背景减少蓝光，墨绿主色舒缓视觉
+ * ========================================
+ */
+
 @layer base {
   :root {
-    --background: 200 100% 97%;
-    --foreground: 220 40% 13%;
+    /* 核心护眼配色 */
+    --background: 45 30% 96%;           /* 暖白背景，类似米纸 */
+    --foreground: 30 25% 20%;           /* 柔和深棕，非纯黑 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 40% 13%;
+    --card: 45 25% 98%;                 /* 卡片略亮 */
+    --card-foreground: 30 25% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 40% 13%;
+    --popover: 45 25% 98%;
+    --popover-foreground: 30 25% 20%;
 
-    --primary: 195 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    /* 墨绿主色 - 护眼、沉稳 */
+    --primary: 160 35% 40%;
+    --primary-foreground: 45 30% 96%;
 
-    --secondary: 54 100% 50%;
-    --secondary-foreground: 220 40% 13%;
+    /* 暖黄次要色 - 温和不刺眼 */
+    --secondary: 38 70% 58%;
+    --secondary-foreground: 30 25% 20%;
 
-    --muted: 200 30% 92%;
-    --muted-foreground: 220 10% 40%;
+    --muted: 40 20% 90%;
+    --muted-foreground: 30 15% 45%;
 
-    --accent: 142 69% 58%;
-    --accent-foreground: 0 0% 100%;
+    /* 柔和绿色 - 成功/正面反馈 */
+    --accent: 145 40% 50%;
+    --accent-foreground: 45 30% 96%;
 
-    --destructive: 0 72% 70%;
-    --destructive-foreground: 0 0% 100%;
+    /* 柔和红色 - 错误/警告，降低饱和度 */
+    --destructive: 5 60% 55%;
+    --destructive-foreground: 45 30% 96%;
 
-    --border: 200 30% 85%;
-    --input: 200 30% 85%;
-    --ring: 195 100% 50%;
+    --border: 40 20% 85%;
+    --input: 40 20% 85%;
+    --ring: 160 35% 40%;
 
-    --radius: 1.5rem;
+    --radius: 1.25rem;
 
-    /* 道闸乐园专属色 */
-    --sky-blue: 195 100% 50%;
-    --golden: 54 100% 50%;
-    --grass-green: 142 69% 58%;
-    --coral-red: 0 72% 70%;
-    --purple-fun: 270 70% 65%;
-    --orange-warm: 25 95% 60%;
+    /* 道闸乐园专属色 - 护眼版本 */
+    --sky-blue: 190 50% 55%;            /* 降低饱和度 */
+    --golden: 38 70% 58%;               /* 暖黄 */
+    --grass-green: 145 40% 50%;         /* 柔和绿 */
+    --coral-red: 5 60% 60%;             /* 柔和珊瑚 */
+    --purple-fun: 270 40% 60%;          /* 降低饱和度 */
+    --orange-warm: 28 65% 58%;          /* 温暖橙 */
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* 护眼模式专属变量 */
+    --eye-care-bg: 45 30% 96%;
+    --eye-care-text: 30 25% 20%;
+    --eye-care-primary: 160 35% 40%;
+    --eye-care-accent: 38 70% 58%;
+
+    --sidebar-background: 45 25% 98%;
+    --sidebar-foreground: 30 25% 20%;
+    --sidebar-primary: 160 35% 40%;
+    --sidebar-primary-foreground: 45 30% 96%;
+    --sidebar-accent: 40 20% 92%;
+    --sidebar-accent-foreground: 30 25% 20%;
+    --sidebar-border: 40 20% 88%;
+    --sidebar-ring: 160 35% 40%;
   }
 
+  /* 夜间模式 - 深灰而非纯黑，减少对比度冲击 */
   .dark {
-    --background: 220 40% 8%;
-    --foreground: 200 30% 95%;
-    --card: 220 40% 12%;
-    --card-foreground: 200 30% 95%;
-    --popover: 220 40% 12%;
-    --popover-foreground: 200 30% 95%;
-    --primary: 195 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 54 100% 50%;
-    --secondary-foreground: 220 40% 13%;
-    --muted: 220 30% 18%;
-    --muted-foreground: 200 20% 60%;
-    --accent: 142 69% 58%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 30% 22%;
-    --input: 220 30% 22%;
-    --ring: 195 100% 50%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 220 15% 18%;
+    --foreground: 40 20% 92%;
+    --card: 220 15% 22%;
+    --card-foreground: 40 20% 92%;
+    --popover: 220 15% 22%;
+    --popover-foreground: 40 20% 92%;
+    --primary: 160 30% 55%;
+    --primary-foreground: 220 15% 12%;
+    --secondary: 38 60% 55%;
+    --secondary-foreground: 220 15% 12%;
+    --muted: 220 12% 28%;
+    --muted-foreground: 40 15% 60%;
+    --accent: 145 35% 55%;
+    --accent-foreground: 220 15% 12%;
+    --destructive: 5 50% 60%;
+    --destructive-foreground: 40 20% 92%;
+    --border: 220 12% 32%;
+    --input: 220 12% 32%;
+    --ring: 160 30% 55%;
+    --sidebar-background: 220 15% 15%;
+    --sidebar-foreground: 40 20% 92%;
+    --sidebar-primary: 160 30% 55%;
+    --sidebar-primary-foreground: 220 15% 12%;
+    --sidebar-accent: 220 12% 25%;
+    --sidebar-accent-foreground: 40 20% 92%;
+    --sidebar-border: 220 12% 30%;
+    --sidebar-ring: 160 30% 55%;
+  }
+
+  /* 护眼模式 - 更暖更柔和 */
+  .eye-care {
+    --background: 45 35% 94%;
+    --foreground: 30 20% 18%;
+    --card: 45 30% 96%;
+    --primary: 160 30% 38%;
+    --secondary: 38 60% 55%;
+    --muted: 40 25% 88%;
+    --accent: 145 35% 48%;
+    --destructive: 5 55% 52%;
+  }
+
+  /* 纸质模式 - 模拟纸张阅读体验 */
+  .paper-mode {
+    --background: 40 25% 92%;
+    --foreground: 30 20% 15%;
+    --card: 40 20% 94%;
+    --primary: 160 30% 35%;
   }
 }
 
@@ -89,51 +128,116 @@
   * {
     @apply border-border;
   }
+  
+  html {
+    font-size: 16px; /* 基准字号，保护视力 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
   body {
     @apply bg-background text-foreground;
-    font-family: 'Nunito', sans-serif;
+    /* 护眼字体栈：优先使用系统默认中文字体 */
+    font-family: 
+      'PingFang SC',           /* 苹方 - macOS/iOS */
+      'Hiragino Sans GB',      /* 冬青黑体 - macOS备用 */
+      'Microsoft YaHei',       /* 微软雅黑 - Windows */
+      'Noto Sans SC',          /* 思源黑体 - Android */
+      'Source Han Sans SC',    /* 思源黑体备用 */
+      'WenQuanYi Micro Hei',   /* 文泉驿 - Linux */
+      'Nunito',                /* 拉丁字符 */
+      sans-serif;
+    font-size: 1rem;           /* 16px基准 */
+    line-height: 1.6;          /* 宽松行距，提高可读性 */
+    letter-spacing: 0.01em;    /* 微字母间距 */
+  }
+  
+  /* 最小字号保护 - 防止过小文字 */
+  small, .text-xs {
+    font-size: 0.875rem;       /* 14px，不小于14px */
+  }
+  
+  /* 幼儿模式 - 更大字体 */
+  .toddler-mode {
+    font-size: 1.125rem;       /* 18px基准 */
+  }
+  
+  .toddler-mode .text-xs {
+    font-size: 1rem;           /* 16px */
+  }
+  
+  .toddler-mode .text-sm {
+    font-size: 1.125rem;       /* 18px */
+  }
+  
+  .toddler-mode .text-base {
+    font-size: 1.25rem;        /* 20px */
+  }
+  
+  .toddler-mode .text-lg {
+    font-size: 1.5rem;         /* 24px */
+  }
+  
+  .toddler-mode .text-xl {
+    font-size: 1.75rem;        /* 28px */
+  }
+  
+  .toddler-mode .text-2xl {
+    font-size: 2rem;           /* 32px */
   }
 }
 
-/* 道闸乐园全局动画 */
+/* ========================================
+   道闸乐园 - 优化动画系统 v1.0
+   设计原则：流畅自然，减少眩晕，支持prefers-reduced-motion
+   ======================================== */
+
+/* 1. 漂浮动画 - 更柔和的幅度 */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-6px); }
 }
 
+/* 2. 摇摆动画 - 减少角度，更温和 */
 @keyframes wiggle {
   0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-3deg); }
-  75% { transform: rotate(3deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
 }
 
+/* 3. 弹入动画 - 减少回弹，更流畅 */
 @keyframes pop-in {
-  0% { transform: scale(0); opacity: 0; }
-  70% { transform: scale(1.1); }
+  0% { transform: scale(0.8); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* 4. 星星爆发 - 简化旋转，减少眩晕 */
 @keyframes star-burst {
   0% { transform: scale(0) rotate(0deg); opacity: 0; }
-  50% { transform: scale(1.3) rotate(180deg); opacity: 1; }
-  100% { transform: scale(1) rotate(360deg); opacity: 1; }
+  50% { transform: scale(1.15) rotate(90deg); opacity: 1; }
+  100% { transform: scale(1) rotate(180deg); opacity: 1; }
 }
 
+/* 5. 彩虹渐变 - 降低速度，更舒缓 */
 @keyframes rainbow-shift {
   0% { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }
 }
 
+/* 6. 轻柔弹跳 - 减小幅度 */
 @keyframes bounce-gentle {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  50% { transform: translateY(-4px); }
 }
 
+/* 7. 发光脉冲 - 降低强度和频率 */
 @keyframes glow-pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px hsl(var(--sky-blue) / 0.5)); }
-  50% { filter: drop-shadow(0 0 20px hsl(var(--sky-blue) / 0.8)); }
+  0%, 100% { filter: drop-shadow(0 0 4px hsl(var(--primary) / 0.3)); }
+  50% { filter: drop-shadow(0 0 12px hsl(var(--primary) / 0.5)); }
 }
 
+/* 8. 道闸升降 - 机械感，线性 */
 @keyframes barrier-lift {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(-90deg); }
@@ -144,12 +248,94 @@
   100% { transform: rotate(0deg); }
 }
 
-.animate-float { animation: float 3s ease-in-out infinite; }
-.animate-wiggle { animation: wiggle 2s ease-in-out infinite; }
-.animate-pop-in { animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-.animate-star-burst { animation: star-burst 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-.animate-bounce-gentle { animation: bounce-gentle 2s ease-in-out infinite; }
-.animate-glow-pulse { animation: glow-pulse 2s ease-in-out infinite; }
+/* 9. 淡入 - 最温和的入场 */
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* 10. 上滑入 - 页面切换 */
+@keyframes slide-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* 11. 按钮点击反馈 - 缩放 */
+@keyframes button-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* 12. 成功反馈 - 柔和闪烁 */
+@keyframes success-pulse {
+  0%, 100% { background-color: hsl(var(--accent) / 0.1); }
+  50% { background-color: hsl(var(--accent) / 0.3); }
+}
+
+/* ========== 动画类 ========== */
+
+.animate-float { 
+  animation: float 4s ease-in-out infinite; 
+  will-change: transform;
+}
+
+.animate-wiggle { 
+  animation: wiggle 2.5s ease-in-out infinite; 
+  will-change: transform;
+}
+
+.animate-pop-in { 
+  animation: pop-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+  will-change: transform, opacity;
+}
+
+.animate-star-burst { 
+  animation: star-burst 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+  will-change: transform, opacity;
+}
+
+.animate-bounce-gentle { 
+  animation: bounce-gentle 2.5s ease-in-out infinite; 
+  will-change: transform;
+}
+
+.animate-glow-pulse { 
+  animation: glow-pulse 3s ease-in-out infinite; 
+  will-change: filter;
+}
+
+.animate-fade-in { 
+  animation: fade-in 0.3s ease-out forwards; 
+  will-change: opacity;
+}
+
+.animate-slide-up { 
+  animation: slide-up 0.3s ease-out forwards; 
+  will-change: transform, opacity;
+}
+
+.animate-button-press { 
+  animation: button-press 0.15s ease-out; 
+}
+
+.animate-success { 
+  animation: success-pulse 0.6s ease-in-out 2; 
+}
+
+/* 彩虹条 - 降低动画速度 */
+.rainbow-bar {
+  background: linear-gradient(90deg, 
+    hsl(0 60% 65%), hsl(30 65% 60%), hsl(45 70% 58%), 
+    hsl(145 45% 55%), hsl(190 45% 55%), hsl(270 35% 60%), hsl(0 60% 65%));
+  background-size: 200% 100%;
+  animation: rainbow-shift 8s linear infinite;
+}
+
+/* 幼儿模式 - 更慢的动画 */
+.toddler-mode .animate-float { animation-duration: 5s; }
+.toddler-mode .animate-wiggle { animation-duration: 3s; }
+.toddler-mode .animate-glow-pulse { animation-duration: 4s; }
 
 .rainbow-bar {
   background: linear-gradient(90deg, 
@@ -159,43 +345,123 @@
   animation: rainbow-shift 3s linear infinite;
 }
 
-/* 超大触摸区 */
+/* ========================================
+   触摸与交互优化
+   ======================================== */
+
+/* 标准触摸区 - 满足WCAG 2.5.5 */
 .touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  @apply flex items-center justify-center cursor-pointer select-none;
+}
+
+/* 大触摸区 - 幼儿模式 */
+.touch-target-lg {
+  min-width: 56px;
+  min-height: 56px;
+  @apply flex items-center justify-center cursor-pointer select-none;
+}
+
+/* 超大触摸区 - 高度可访问性 */
+.touch-target-xl {
   min-width: 70px;
   min-height: 70px;
   @apply flex items-center justify-center cursor-pointer select-none;
 }
 
-/* 高对比度模式 */
+/* 按钮点击状态 */
+button:active, .btn-active {
+  transform: scale(0.97);
+  transition: transform 0.1s ease-out;
+}
+
+/* 焦点样式 - 清晰可见 */
+:focus-visible {
+  outline: 3px solid hsl(var(--primary));
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+
+/* 禁用焦点轮廓的情况 */
+.focus-hidden:focus {
+  outline: none;
+}
+
+/* ========================================
+   高对比度模式 - WCAG AAA级
+   ======================================== */
 .high-contrast {
-  --background: 0 0% 0%;
-  --foreground: 0 0% 100%;
-  --card: 0 0% 8%;
-  --card-foreground: 0 0% 100%;
-  --primary: 54 100% 55%;
-  --primary-foreground: 0 0% 0%;
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 75%;
-  --border: 0 0% 30%;
-  --accent: 142 100% 50%;
-  --accent-foreground: 0 0% 0%;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  --primary: 240 100% 40%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 0%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 30%;
+  --border: 0 0% 0%;
+  --accent: 120 100% 30%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 100% 40%;
+  --destructive-foreground: 0 0% 100%;
 }
 
 .high-contrast * {
   border-width: 2px !important;
-  font-weight: 700 !important;
+  border-color: black !important;
 }
 
-/* 减少动画 - 无障碍 */
+.high-contrast button,
+.high-contrast [role="button"] {
+  border: 3px solid black !important;
+}
+
+/* ========================================
+   色盲友好模式
+   ======================================== */
+
+/* 红绿色盲友好 - 使用图案+颜色双重编码 */
+.colorblind-friendly .status-success::before {
+  content: "✓ ";
+}
+
+.colorblind-friendly .status-error::before {
+  content: "✕ ";
+}
+
+.colorblind-friendly .status-warning::before {
+  content: "! ";
+}
+
+/* 形状区分 */
+.colorblind-friendly .btn-primary {
+  border-radius: 8px;
+}
+
+.colorblind-friendly .btn-secondary {
+  border-radius: 50px;
+}
+
+.colorblind-friendly .btn-danger {
+  border-radius: 4px;
+}
+
+/* ========================================
+   无障碍支持 - 减少动画
+   ======================================== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* 屏幕阅读器辅助 */
+/* 屏幕阅读器辅助 - 仅对屏幕阅读器可见 */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -208,9 +474,264 @@
   border-width: 0;
 }
 
-/* 焦点可见性 - 键盘导航 */
-:focus-visible {
-  outline: 3px solid hsl(var(--primary));
-  outline-offset: 2px;
-  border-radius: var(--radius);
+/* 屏幕阅读器可见，但视觉上隐藏 */
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 跳转到主要内容链接 */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 8px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ========================================
+   Phase 3: 交互体验升级
+   ======================================== */
+
+/* 页面切换动画 */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-out-left {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-30%); opacity: 0; }
+}
+
+/* 涟漪动画 */
+@keyframes ripple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.5;
+  }
+  100% {
+    width: 500px;
+    height: 500px;
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 0.6s ease-out forwards;
+}
+
+/* 页面切换动画类 */
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.animate-slide-out-left {
+  animation: slide-out-left 0.3s ease-out forwards;
+}
+
+/* 触摸优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 移动端触摸优化 */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  button,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .animate-ripple,
+  .animate-slide-in-right,
+  .animate-slide-out-left {
+    animation: none !important;
+  }
+}
+
+/* ========================================
+   实用工具类
+   ======================================== */
+
+/* 文本选择 - 护眼色 */
+::selection {
+  background-color: hsl(var(--primary) / 0.3);
+  color: hsl(var(--foreground));
+}
+
+/* 滚动条 - 简洁风格 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* 链接下划线 - 更清晰 */
+a:not([class]) {
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--primary) / 0.4);
+  text-underline-offset: 0.2em;
+}
+
+a:not([class]):hover {
+  text-decoration-color: hsl(var(--primary));
+}
+
+/* ========================================
+   色盲友好模式
+   ======================================== */
+
+/* 红绿色盲友好 - 使用图案+颜色双重编码 */
+.colorblind-friendly .status-success::before {
+  content: "✓ ";
+}
+
+.colorblind-friendly .status-error::before {
+  content: "✕ ";
+}
+
+.colorblind-friendly .status-warning::before {
+  content: "! ";
+}
+
+/* 形状区分 */
+.colorblind-friendly .btn-primary {
+  border-radius: 8px;
+}
+
+.colorblind-friendly .btn-secondary {
+  border-radius: 50px;
+}
+
+.colorblind-friendly .btn-danger {
+  border-radius: 4px;
+}
+
+/* ========================================
+   无障碍支持 - 减少动画
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 屏幕阅读器辅助 - 仅对屏幕阅读器可见 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 屏幕阅读器可见，但视觉上隐藏 */
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 跳转到主要内容链接 */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 8px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ========================================
+   实用工具类
+   ======================================== */
+
+/* 文本选择 - 护眼色 */
+::selection {
+  background-color: hsl(var(--primary) / 0.3);
+  color: hsl(var(--foreground));
+}
+
+/* 滚动条 - 简洁风格 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* 链接下划线 - 更清晰 */
+a:not([class]) {
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--primary) / 0.4);
+  text-underline-offset: 0.2em;
+}
+
+a:not([class]):hover {
+  text-decoration-color: hsl(var(--primary));
 }

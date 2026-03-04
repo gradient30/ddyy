@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>离线模式 - 道闸乐园</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background: white;
+      border-radius: 24px;
+      padding: 48px 32px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .mascot {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, #5A9B8C 0%, #4A8B7C 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #2d6a4f;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #5A9B8C;
+      margin-bottom: 32px;
+    }
+
+    .message {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+
+    .status-icon {
+      width: 12px;
+      height: 12px;
+      background: #dc3545;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 16px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #5A9B8C 0%, #4A8B7C 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(90, 155, 140, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #5A9B8C;
+      border: 2px solid #e9ecef;
+    }
+
+    .btn-secondary:hover {
+      background: #e9ecef;
+    }
+
+    .offline-games {
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .offline-games h2 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 16px;
+    }
+
+    .game-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .game-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .game-item:hover {
+      background: #e9ecef;
+    }
+
+    .game-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #ffd93d 0%, #ff9f1c 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .game-info {
+      flex: 1;
+      text-align: left;
+    }
+
+    .game-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .game-desc {
+      font-size: 14px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    .tips {
+      margin-top: 24px;
+      padding: 16px;
+      background: #fff3cd;
+      border-radius: 12px;
+      border-left: 4px solid #ffc107;
+    }
+
+    .tips-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #856404;
+      margin-bottom: 8px;
+    }
+
+    .tips-list {
+      list-style: none;
+      text-align: left;
+    }
+
+    .tips-list li {
+      font-size: 14px;
+      color: #856404;
+      padding: 4px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .tips-list li::before {
+      content: "•";
+      position: absolute;
+      left: 4px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* 幼儿版样式 */
+    @media (max-width: 480px) {
+      .container {
+        padding: 32px 24px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .mascot {
+        width: 100px;
+        height: 100px;
+        font-size: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="mascot">🦉</div>
+    <h1>哎呀，断网了！</h1>
+    <p class="subtitle">小查查正在想办法...</p>
+    
+    <p class="message">
+      看起来你的网络连接不太稳定。<br>
+      别担心，一些游戏和内容仍然可以玩！
+    </p>
+
+    <div class="status">
+      <div class="status-icon"></div>
+      <span class="status-text" id="network-status">正在检查网络...</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="retryConnection()">
+        🔄 重新连接
+      </button>
+      <button class="btn btn-secondary" onclick="goHome()">
+        🏠 返回首页
+      </button>
+    </div>
+
+    <div class="offline-games">
+      <h2>🎮 离线也能玩的游戏</h2>
+      <div class="game-list">
+        <div class="game-item" onclick="goHome()">
+          <div class="game-icon">🎨</div>
+          <div class="game-info">
+            <div class="game-name">道闸涂色</div>
+            <div class="game-desc">发挥创意，给道闸涂色</div>
+          </div>
+        </div>
+        <div class="game-item" onclick="goHome()">
+          <div class="game-icon">📖</div>
+          <div class="game-info">
+            <div class="game-name">绘本故事</div>
+            <div class="game-desc">阅读已下载的故事</div>
+          </div>
+        </div>
+        <div class="game-item" onclick="goHome()">
+          <div class="game-icon">🧩</div>
+          <div class="game-info">
+            <div class="game-name">益智游戏</div>
+            <div class="game-desc">挑战你的大脑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tips">
+      <div class="tips-title">💡 小贴士</div>
+      <ul class="tips-list">
+        <li>检查 WiFi 或移动数据是否开启</li>
+        <li>尝试刷新页面</li>
+        <li>在网络好的时候多下载些内容</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // 检查网络状态
+    function checkNetworkStatus() {
+      const statusEl = document.getElementById('network-status');
+      const statusIcon = document.querySelector('.status-icon');
+
+      if (navigator.onLine) {
+        statusEl.textContent = '网络已恢复！正在返回...';
+        statusIcon.style.background = '#28a745';
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+      } else {
+        statusEl.textContent = '当前处于离线模式';
+        statusIcon.style.background = '#dc3545';
+      }
+    }
+
+    // 重试连接
+    function retryConnection() {
+      const btn = document.querySelector('.btn-primary');
+      btn.textContent = '🔄 正在尝试...';
+      btn.disabled = true;
+
+      // 尝试重新加载页面
+      window.location.reload();
+    }
+
+    // 返回首页
+    function goHome() {
+      window.location.href = '/';
+    }
+
+    // 监听网络状态变化
+    window.addEventListener('online', () => {
+      checkNetworkStatus();
+    });
+
+    window.addEventListener('offline', () => {
+      const statusEl = document.getElementById('network-status');
+      const statusIcon = document.querySelector('.status-icon');
+      statusEl.textContent = '当前处于离线模式';
+      statusIcon.style.background = '#dc3545';
+    });
+
+    // 初始化
+    checkNetworkStatus();
+
+    // 定期检测网络恢复
+    setInterval(checkNetworkStatus, 5000);
+  </script>
+</body>
+</html>
