@@ -442,7 +442,7 @@ const ColoringPage: React.FC = () => {
               {/* 工具选择 */}
               <div className="flex gap-2 justify-center">
                 {([['brush', '🖌️', '画笔'], ['eraser', '🧹', '橡皮'], ['sticker', '⭐', '贴纸']] as const).map(([t, e, n]) => (
-                  <button key={t} onClick={() => { playClick(); setTool(t as any); }}
+                  <button key={t} onClick={() => { playClick(); setTool(t); }}
                     className={`rounded-xl px-3 py-2 text-sm font-bold transition-all ${tool === t ? 'bg-sky/30 ring-2 ring-sky' : 'bg-muted'}`}>
                     {e} {n}
                   </button>

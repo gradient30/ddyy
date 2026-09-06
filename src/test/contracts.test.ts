@@ -1,13 +1,12 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BADGES } from '@/data/badges';
 import { AUDIO_MANIFEST } from '@/data/audio-manifest';
 import { KNOWLEDGE, STATIONS } from '@/data/curriculum';
 import { VOCAB } from '@/data/vocab';
 
-const root = resolve(fileURLToPath(new URL('.', import.meta.url)), '../..');
+const root = process.cwd();
 const src = join(root, 'src');
 
 function read(rel: string): string {

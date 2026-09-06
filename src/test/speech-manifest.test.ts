@@ -1,10 +1,9 @@
 import { existsSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { AUDIO_MANIFEST } from '@/data/audio-manifest';
 
-const publicDir = resolve(fileURLToPath(new URL('.', import.meta.url)), '../../public');
+const publicDir = join(process.cwd(), 'public');
 
 describe('AUDIO_MANIFEST', () => {
   it('maps teaching lines to mp3 files under audio/', () => {
