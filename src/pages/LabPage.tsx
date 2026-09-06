@@ -5,6 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import { playClick, playSuccess, playError, playBarrierLift, vibrate } from '@/lib/sound';
 import { speak, speakBilingual, delay } from '@/lib/speech';
 import { PartIcon } from '@/components/parts/PartIcons';
+import { barrierRaisedForSensor } from '@/lib/science';
 import { AnatomyDiagram, LeverDiagram, SolarMotorDiagram, SensorDiagram } from '@/components/scenes/LabScenes';
 
 // ===================== PREDICTION COMPONENT =====================
@@ -263,9 +264,10 @@ const Exp3MotorSolar: React.FC<{ onComplete: () => void }> = ({ onComplete }) =>
 
 const Exp4Sensor: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [blocking, setBlocking] = useState(false);
-  const [barrierUp, setBarrierUp] = useState(true);
+  const [idleRaised, setIdleRaised] = useState(true);
   const [trialCount, setTrialCount] = useState(0);
   const [done, setDone] = useState(false);
+  const barrierUp = barrierRaisedForSensor(blocking, idleRaised);
 
   useEffect(() => {
     speak('试试点挡住按钮，看看道闸会怎样？');
@@ -275,7 +277,6 @@ const Exp4Sensor: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
     if (done) return;
     playClick();
     setBlocking(true);
-    setBarrierUp(false);
     vibrate(50);
     speak('有东西挡住了！道闸停下来，保护安全！');
   };
@@ -284,8 +285,7 @@ const Exp4Sensor: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
     if (done) return;
     playClick();
     setBlocking(false);
-    setBarrierUp(true);
-    playBarrierLift();
+    setIdleRaised(false);
     setTrialCount(prev => {
       const next = prev + 1;
       if (next >= 2 && !done) {
@@ -293,6 +293,11 @@ const Exp4Sensor: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
         playSuccess();
         speak('太棒了！传感器就像道闸的小眼睛，发现障碍物就会停下来！');
         setTimeout(onComplete, 2500);
+      } else {
+        setTimeout(() => {
+          setIdleRaised(true);
+          playBarrierLift();
+        }, 700);
       }
       return next;
     });

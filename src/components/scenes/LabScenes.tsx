@@ -143,8 +143,8 @@ export const SensorDiagram: React.FC<{ blocking: boolean; barrierUp: boolean }> 
     {/* Labels */}
     <text x="18" y="112" fontSize="7" textAnchor="middle" fill="hsl(var(--muted-foreground))">👁️发射</text>
     <text x="200" y="112" fontSize="7" textAnchor="middle" fill="hsl(var(--muted-foreground))">👁️接收</text>
-    <text x="110" y="90" fontSize="6" textAnchor="middle" fill={blocking ? 'hsl(0,80%,55%)' : 'hsl(var(--muted-foreground))'} fontWeight="bold">
-      {blocking ? '⚠️ 光线被挡' : '红外光线'}
+    <text x="110" y={blocking ? 68 : 90} fontSize="6" textAnchor="middle" fill={blocking ? 'hsl(0,80%,55%)' : 'hsl(var(--muted-foreground))'} fontWeight="bold">
+      {blocking ? '停住了，杆子抬着' : '红外光线'}
     </text>
   </svg>
 ));
