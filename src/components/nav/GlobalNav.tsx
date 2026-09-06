@@ -26,7 +26,7 @@ const GlobalNav: React.FC = () => {
   if (!currentProfile) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-12 bg-card/90 backdrop-blur-md border-b border-border px-2 md:px-4 flex items-center gap-2">
+    <div className="fixed left-0 right-0 z-50 h-12 bg-card/90 backdrop-blur-md border-b border-border px-2 md:px-4 flex items-center gap-2" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
       <button onClick={handleHome} className="rounded-xl bg-primary/10 hover:bg-primary/20 active:scale-95 transition-all w-10 h-10 text-xl" aria-label="回到首页">
         🏠
       </button>
