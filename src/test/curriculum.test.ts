@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { hasBadge, normalizeBadgeId } from '@/data/badges';
 import { isStationUnlocked, recommendedStation, STATIONS } from '@/data/curriculum';
@@ -43,9 +46,11 @@ describe('age-layered vocabulary', () => {
 });
 
 describe('science facts used in copy', () => {
-  it('teaches effort farther from fulcrum, not load farther', async () => {
-    const lab = await import('../pages/LabPage.tsx?raw');
-    const src = String(lab.default ?? lab);
+  it('teaches effort farther from fulcrum, not load farther', () => {
+    const src = readFileSync(
+      resolve(fileURLToPath(new URL('.', import.meta.url)), '../pages/LabPage.tsx'),
+      'utf8',
+    );
     expect(src).toMatch(/推的地方离支点越远/);
     expect(src).not.toMatch(/重物离支点越远，抬起来越省力/);
   });

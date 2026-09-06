@@ -15,10 +15,26 @@
 ```sh
 npm install
 npm run dev
-npm run test
-npm run build
+npm run ci
 ```
 
-## 课程依据
+`npm run ci` 会跑类型检查、测试、lint，以及 `/ddyy/` 与 `/` 两套构建（对应 GitHub Pages 与 Cloudflare）。
 
-对照《3–6 岁儿童学习与发展指南》五大领域，并补上 4–7 岁关键的数感分层。详见 `src/data/curriculum.ts`。
+开发服务器默认 `http://localhost:8080`。
+
+## 工程入口
+
+后续迭代从这些文件开始，不要沿用已作废的 [PR #1](https://github.com/gradient30/ddyy/pull/1) 交接稿：
+
+| 文件 | 用途 |
+|------|------|
+| [AGENTS.md](./AGENTS.md) | 产品、契约、禁区、语音与发布 |
+| [docs/architecture.md](./docs/architecture.md) | 当前运行时与数据模型 |
+| [docs/iteration.md](./docs/iteration.md) | 按改动类型怎么改、怎么验 |
+
+课程真值在 `src/data/curriculum.ts`。对照《3–6 岁儿童学习与发展指南》五大领域，并补上 4–7 岁数感分层。
+
+## 发布
+
+- GitHub Pages：`/ddyy/`（`VITE_BASE_URL=/ddyy/`）
+- Cloudflare Pages：根路径
