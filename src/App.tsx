@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GameProvider, useGame } from "@/contexts/GameContext";
+import { routerBasename } from "@/lib/utils";
 import React, { Suspense } from "react";
 
 const Index = React.lazy(() => import("./pages/Index"));
@@ -40,7 +41,7 @@ const AppContent = () => {
     <div className={state.globalSettings.highContrast ? 'high-contrast' : ''}>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter basename={routerBasename()}>
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route path="/" element={<Index />} />

@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8">
-    <title>道闸入门</title>
+    <title>道闸成长小路</title>
     <script>
-      // GitHub Pages SPA 重定向
-      // 项目级仓库：base = '/ddyy'
-      // 用户级仓库（username.github.io）：base = ''
-      var base = '/ddyy';
-      var pathSegmentsToKeep = base ? 1 : 0;
+      // GitHub Pages 没有 SPA fallback：把 /ddyy/welcome 转到 /ddyy/?/welcome
+      // index.html 再还原成正常路径，交给 React Router。
+      var pathSegmentsToKeep = 1;
       var l = window.location;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        base + '/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/') +
-        (l.search || '') +
-        (l.hash || '')
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
       );
     </script>
   </head>
