@@ -1,11 +1,12 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import GlobalNav from '@/components/nav/GlobalNav';
 import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { useGame } from '@/contexts/GameContext';
+import { getAgeConfig } from '@/data/age';
+import { carOverlapsSpot, isCorrectLightAction, maxSafetyLevels, pickTrafficLight, safetyStationCleared, type LightAction, type TrafficLight } from '@/lib/traffic';
 import { playClick, playSuccess, playError, playBarrierLift, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
-import { ParkingLotScene, IntersectionScene, CrosswalkScene, DrivingRoadScene } from '@/components/scenes/TrafficScenes';
+import { ParkingLotScene, IntersectionScene, CrosswalkScene } from '@/components/scenes/TrafficScenes';
 
 // ===================== WHY PROMPT COMPONENT =====================
 
@@ -88,10 +89,12 @@ const WHY_PROMPTS: Record<number, { question: string; options: { text: string; c
 // ===================== LEVEL 1: PARKING =====================
 
 const Level1Parking: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const [carX, setCarX] = useState(50);
+  const [carX, setCarX] = useState(22);
   const [parked, setParked] = useState(false);
   const [barrierUp, setBarrierUp] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const carRef = useRef<HTMLDivElement>(null);
+  const spotRef = useRef<HTMLDivElement>(null);
 
   const handleMove = useCallback((clientX: number) => {
     if (parked) return;
@@ -101,113 +104,123 @@ const Level1Parking: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
     setCarX(Math.max(10, Math.min(90, x)));
   }, [parked]);
 
+  const finishPark = () => {
+    setParked(true);
+    playSuccess();
+    vibrate(100);
+    setBarrierUp(true);
+    playBarrierLift();
+    speak('太棒了！车停好了，道闸升起来啦！');
+    setTimeout(onComplete, 1800);
+  };
+
   const handleCheck = () => {
-    if (carX >= 55 && carX <= 80) {
-      setParked(true);
-      playSuccess();
-      vibrate(100);
-      setBarrierUp(true);
-      playBarrierLift();
-      speak('太棒了！车停好了，道闸升起来啦！');
-      setTimeout(onComplete, 2500);
-    } else {
-      playError();
-      speak('再试试，把车拖到蓝色停车位里');
+    const car = carRef.current?.getBoundingClientRect();
+    const spot = spotRef.current?.getBoundingClientRect();
+    if (car && spot && carOverlapsSpot(car, spot)) {
+      finishPark();
+      return;
     }
+    playError();
+    speak('再试试，把车拖到蓝色停车位里');
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-64 rounded-3xl overflow-hidden touch-none"
-      onTouchMove={(e) => handleMove(e.touches[0].clientX)}
-      onMouseMove={(e) => e.buttons && handleMove(e.clientX)}>
-      <ParkingLotScene />
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-foreground/10 rounded-b-3xl" />
-      <div className="absolute bottom-0 left-0 right-0 h-20 bg-foreground/20 rounded-b-3xl" />
-      <div className="absolute bottom-8 left-0 right-0 h-1 border-t-2 border-dashed border-secondary" />
-      <div className="absolute bottom-2 right-[12%] w-24 h-20 border-4 border-dashed border-primary rounded-xl flex items-center justify-center bg-primary/10">
-        <span className="text-2xl font-bold text-primary">🅿️</span>
-      </div>
-      <div className="absolute bottom-14 right-[38%]">
-        <div className="w-6 h-20 bg-foreground/50 rounded-t-lg" />
-        <div className={`absolute top-1 left-5 w-28 h-5 rounded-full origin-left transition-transform duration-700 overflow-hidden ${barrierUp ? '-rotate-[85deg]' : 'rotate-0'}`}
-          style={{ background: 'repeating-linear-gradient(90deg, #E25B4C 0 14px, #FFF8EE 14px 28px)' }}>
-          <div className="absolute right-0 top-0.5 w-4 h-4 rounded-full bg-secondary" />
+    <div className="flex flex-col gap-3">
+      <div ref={containerRef} className="relative w-full h-64 rounded-3xl overflow-hidden touch-none"
+        onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+        onMouseMove={(e) => e.buttons && handleMove(e.clientX)}>
+        <ParkingLotScene />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-foreground/10 rounded-b-3xl" />
+        <div className="absolute bottom-8 left-0 right-0 h-1 border-t-2 border-dashed border-secondary" />
+        <div ref={spotRef} className="absolute bottom-2 right-[8%] w-28 h-20 border-4 border-dashed border-primary rounded-xl flex items-center justify-center bg-primary/10">
+          <span className="text-2xl font-bold text-primary">🅿️</span>
         </div>
-      </div>
-      <div className="absolute bottom-3 transition-all duration-150 text-6xl select-none cursor-grab active:cursor-grabbing"
-        style={{ left: `${carX}%`, transform: 'translateX(-50%)' }}>
-        🚙
+        <div className="absolute bottom-14 left-[18%]">
+          <div className="w-6 h-20 bg-foreground/50 rounded-t-lg" />
+          <div className={`absolute top-1 left-5 w-28 h-5 rounded-full origin-left transition-transform duration-700 overflow-hidden ${barrierUp ? '-rotate-[85deg]' : 'rotate-0'}`}
+            style={{ background: 'repeating-linear-gradient(90deg, #E25B4C 0 14px, #FFF8EE 14px 28px)' }}>
+            <div className="absolute right-0 top-0.5 w-4 h-4 rounded-full bg-secondary" />
+          </div>
+        </div>
+        <div ref={carRef} className="absolute bottom-3 transition-all duration-150 text-6xl select-none cursor-grab active:cursor-grabbing"
+          style={{ left: `${carX}%`, transform: 'translateX(-50%)' }}>
+          🚙
+        </div>
+        {parked && <div className="absolute inset-0 flex items-center justify-center text-4xl animate-pop-in pointer-events-none">🎉</div>}
       </div>
       {!parked && (
-        <button onClick={handleCheck}
-          className="absolute top-3 right-3 touch-target rounded-2xl bg-accent text-accent-foreground font-bold px-4 py-2 active:scale-95 transition-transform">
-          ✅ 停好了！
-        </button>
+        <div className="flex gap-2 justify-center">
+          <button onClick={() => { playClick(); setCarX(78); }} className="kid-btn px-4 bg-primary/15 text-foreground">开进车位</button>
+          <button onClick={handleCheck} className="kid-btn px-4 bg-accent text-accent-foreground">停好了</button>
+        </div>
       )}
-      {parked && <div className="absolute inset-0 flex items-center justify-center text-4xl animate-pop-in">🎉</div>}
     </div>
   );
 };
 
 // ===================== LEVEL 2: TRAFFIC LIGHT =====================
 
+const LightChoices: React.FC<{
+  light: TrafficLight;
+  locked: boolean;
+  picked: LightAction | null;
+  correct: boolean | null;
+  onPick: (action: LightAction) => void;
+}> = ({ light, locked, picked, correct, onPick }) => (
+  <>
+    <div className="bg-foreground/80 rounded-2xl p-3 flex flex-col gap-2 items-center w-16 relative z-10">
+      <div className={`w-14 h-14 rounded-full border-4 border-card ${light === 'red' ? 'bg-destructive shadow-[0_0_20px_hsl(var(--destructive))]' : 'bg-foreground/30'}`} />
+      <div className="w-14 h-14 rounded-full border-4 border-card bg-foreground/30" />
+      <div className={`w-14 h-14 rounded-full border-4 border-card ${light === 'green' ? 'bg-accent shadow-[0_0_20px_hsl(var(--grass-green))]' : 'bg-foreground/30'}`} />
+    </div>
+    <div className="flex gap-3 relative z-10">
+      {([
+        { action: 'stop' as const, label: '🛑 停', bg: 'bg-destructive/20' },
+        { action: 'go' as const, label: '✅ 行', bg: 'bg-accent/20' },
+      ]).map(b => (
+        <button key={b.action} onClick={() => onPick(b.action)}
+          disabled={locked}
+          className={`touch-target rounded-2xl ${b.bg} font-bold text-lg px-6 py-3 active:scale-95 transition-all ${
+            picked === b.action ? (correct ? 'ring-4 ring-accent' : 'ring-4 ring-destructive') : ''
+          }`}>
+          {b.label}
+        </button>
+      ))}
+    </div>
+  </>
+);
+
 const Level2TrafficLight: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const [lightColor, setLightColor] = useState<'red' | 'green' | 'yellow'>('red');
-  const [answer, setAnswer] = useState<string | null>(null);
+  const [light] = useState<TrafficLight>(() => pickTrafficLight());
+  const [picked, setPicked] = useState<LightAction | null>(null);
   const [correct, setCorrect] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    const colors: ('red' | 'green' | 'yellow')[] = ['red', 'green', 'yellow'];
-    setLightColor(colors[Math.floor(Math.random() * colors.length)]);
-  }, []);
-
-  const check = (action: string) => {
+  const check = (action: LightAction) => {
     playClick();
-    setAnswer(action);
-    const isCorrect = (lightColor === 'red' && action === 'stop') ||
-                      (lightColor === 'green' && action === 'go') ||
-                      (lightColor === 'yellow' && action === 'slow');
-    setCorrect(isCorrect);
-    if (isCorrect) {
+    setPicked(action);
+    const ok = isCorrectLightAction(light, action);
+    setCorrect(ok);
+    if (ok) {
       playSuccess();
       vibrate(100);
-      speak(lightColor === 'red' ? '对了！红灯停！' : lightColor === 'green' ? '对了！绿灯行！' : '对了！黄灯要减速！');
-      setTimeout(onComplete, 2000);
+      speak(light === 'red' ? '对了！红灯停！' : '对了！绿灯行！');
+      setTimeout(onComplete, 1200);
     } else {
       playError();
       speak('再想想，这个灯是什么意思？');
-      setTimeout(() => { setAnswer(null); setCorrect(null); }, 1500);
+      setTimeout(() => { setPicked(null); setCorrect(null); }, 1200);
     }
   };
 
-  const lightColors = {
-    red: 'bg-destructive shadow-[0_0_20px_hsl(var(--destructive))]',
-    yellow: 'bg-secondary shadow-[0_0_20px_hsl(var(--golden))]',
-    green: 'bg-accent shadow-[0_0_20px_hsl(var(--grass-green))]',
-  };
-
   return (
-    <div className="flex flex-col items-center gap-4 relative">
+    <div className="relative w-full rounded-3xl overflow-hidden min-h-[280px] flex flex-col items-center justify-center gap-4 py-4">
       <IntersectionScene />
-      <div className="bg-foreground/80 rounded-2xl p-3 flex flex-col gap-2 items-center w-16">
-        <div className={`w-16 h-16 rounded-full border-4 border-card ${lightColor === 'red' ? lightColors.red : 'bg-foreground/30'}`} />
-        <div className={`w-16 h-16 rounded-full border-4 border-card ${lightColor === 'yellow' ? lightColors.yellow : 'bg-foreground/30'}`} />
-        <div className={`w-16 h-16 rounded-full border-4 border-card ${lightColor === 'green' ? lightColors.green : 'bg-foreground/30'}`} />
-      </div>
-      <div className="flex gap-3">
-        {[
-          { action: 'stop', label: '🛑 停', bg: 'bg-destructive/20 hover:bg-destructive/30' },
-          { action: 'slow', label: '⚠️ 慢', bg: 'bg-secondary/20 hover:bg-secondary/30' },
-          { action: 'go', label: '✅ 行', bg: 'bg-accent/20 hover:bg-accent/30' },
-        ].map(b => (
-          <button key={b.action} onClick={() => check(b.action)}
-            disabled={answer !== null}
-            className={`touch-target rounded-2xl ${b.bg} font-bold text-lg px-5 py-3 active:scale-95 transition-all ${answer === b.action ? (correct ? 'ring-4 ring-accent' : 'ring-4 ring-destructive') : ''}`}>
-            {b.label}
-          </button>
-        ))}
-      </div>
-      {correct && <div className="text-2xl animate-pop-in">🎉 太棒了！</div>}
+      <p className="relative z-10 text-lg font-black bg-card/90 px-3 py-1 rounded-xl">
+        {light === 'red' ? '现在是红灯' : '现在是绿灯'}
+      </p>
+      <LightChoices light={light} locked={picked !== null} picked={picked} correct={correct} onPick={check} />
+      {correct && <div className="relative z-10 text-2xl animate-pop-in">🎉 太棒了！</div>}
     </div>
   );
 };
@@ -219,6 +232,11 @@ const Level3CountCars: React.FC<{ onComplete: () => void }> = ({ onComplete }) =
   const [selected, setSelected] = useState<number | null>(null);
   const [correct, setCorrect] = useState<boolean | null>(null);
   const cars = ['🚗', '🚙', '🚕', '🚌', '🚎', '🏎️', '🚑', '🚒', '🚐', '🛻'];
+  const options = useMemo(
+    () => [targetCount - 2, targetCount - 1, targetCount, targetCount + 1, targetCount + 2]
+      .filter(n => n > 0 && n <= 20),
+    [targetCount],
+  );
 
   const check = (n: number) => {
     playClick();
@@ -248,10 +266,7 @@ const Level3CountCars: React.FC<{ onComplete: () => void }> = ({ onComplete }) =
         ))}
       </div>
       <div className="flex flex-wrap gap-2 justify-center">
-        {[targetCount - 2, targetCount - 1, targetCount, targetCount + 1, targetCount + 2]
-          .filter(n => n > 0 && n <= 20)
-          .sort(() => Math.random() - 0.5)
-          .map(n => (
+        {options.map(n => (
             <button key={n} onClick={() => check(n)}
               disabled={selected !== null}
               className={`w-14 h-14 rounded-2xl text-2xl font-black transition-all active:scale-95 ${
@@ -328,80 +343,49 @@ const Level4Crosswalk: React.FC<{ onComplete: () => void }> = ({ onComplete }) =
 // ===================== LEVEL 5: DRIVING =====================
 
 const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const [carLane, setCarLane] = useState(1);
-  const [score, setScore] = useState(0);
-  const [obstacles, setObstacles] = useState<{ lane: number; top: number; id: number }[]>([]);
-  const [gameOver, setGameOver] = useState(false);
-  const nextId = useRef(0);
+  const [round, setRound] = useState(0);
+  const [light, setLight] = useState<TrafficLight>(() => pickTrafficLight());
+  const [picked, setPicked] = useState<LightAction | null>(null);
+  const [correct, setCorrect] = useState<boolean | null>(null);
+  const need = 3;
 
-  useEffect(() => {
-    if (gameOver) return;
-    const interval = setInterval(() => {
-      setObstacles(prev => {
-        const moved = prev.map(o => ({ ...o, top: o.top + 5 })).filter(o => o.top < 110);
-        const hit = moved.some(o => o.top > 75 && o.top < 95 && o.lane === carLane);
-        if (hit) {
-          playError();
-          setGameOver(true);
-          clearInterval(interval);
-          return moved;
-        }
-        const dodged = prev.filter(o => o.top <= 95).length - moved.filter(o => o.top <= 95).length;
-        if (dodged > 0) setScore(s => s + dodged);
-        if (Math.random() < 0.1) {
-          moved.push({ lane: Math.floor(Math.random() * 3), top: -10, id: nextId.current++ });
-        }
-        return moved;
-      });
-    }, 150);
-    return () => clearInterval(interval);
-  }, [carLane, gameOver]);
-
-  useEffect(() => {
-    if (score >= 10 && !gameOver) {
-      setGameOver(true);
-      playSuccess();
-      vibrate(100);
-      speak('太棒了！安全驾驶小达人！');
-      setTimeout(onComplete, 2000);
-    }
-  }, [score, gameOver, onComplete]);
-
-  const moveCar = (dir: number) => {
+  const check = (action: LightAction) => {
     playClick();
-    setCarLane(prev => Math.max(0, Math.min(2, prev + dir)));
+    setPicked(action);
+    const ok = isCorrectLightAction(light, action);
+    setCorrect(ok);
+    if (ok) {
+      playSuccess();
+      vibrate(80);
+      speak(light === 'red' ? '对了！红灯停！' : '对了！绿灯行！');
+      const next = round + 1;
+      if (next >= need) {
+        speak('太棒了！安全驾驶小达人！');
+        setTimeout(onComplete, 1200);
+        return;
+      }
+      setTimeout(() => {
+        setRound(next);
+        setLight(pickTrafficLight());
+        setPicked(null);
+        setCorrect(null);
+      }, 1000);
+    } else {
+      playError();
+      speak('再想想，这个灯是什么意思？');
+      setTimeout(() => { setPicked(null); setCorrect(null); }, 1200);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <p className="font-bold text-foreground">躲避障碍！得分: {score}/10</p>
-      <div className="relative w-64 h-80 rounded-2xl overflow-hidden">
-        <DrivingRoadScene />
-        {[1, 2].map(i => (
-          <div key={i} className="absolute top-0 bottom-0 w-px border-l border-dashed border-muted-foreground/30"
-            style={{ left: `${(i * 100) / 3}%` }} />
-        ))}
-        {obstacles.map(o => (
-          <div key={o.id} className="absolute text-4xl transition-none"
-            style={{ left: `${(o.lane * 100) / 3 + 16.6}%`, top: `${o.top}%`, transform: 'translate(-50%, -50%)' }}>
-            🚧
-          </div>
-        ))}
-        <div className="absolute bottom-4 text-5xl transition-all duration-150"
-          style={{ left: `${(carLane * 100) / 3 + 16.6}%`, transform: 'translateX(-50%)' }}>
-          🚙
-        </div>
-      </div>
-      <div className="flex gap-3">
-        <button onClick={() => moveCar(-1)} className="touch-target rounded-2xl bg-primary/15 hover:bg-primary/25 font-bold text-xl px-5 py-3 active:scale-95">⬅️</button>
-        <button onClick={() => moveCar(1)} className="touch-target rounded-2xl bg-primary/15 hover:bg-primary/25 font-bold text-xl px-5 py-3 active:scale-95">➡️</button>
-      </div>
-      {gameOver && score < 10 && (
-        <button onClick={() => { setGameOver(false); setScore(0); setObstacles([]); }}
-          className="touch-target rounded-2xl bg-accent/20 font-bold px-5 py-3 active:scale-95">
-          🔄 再来一次
-        </button>
-      )}
+    <div className="relative w-full rounded-3xl overflow-hidden min-h-[280px] flex flex-col items-center justify-center gap-3 py-4">
+      <IntersectionScene />
+      <p className="relative z-10 font-black bg-card/90 px-3 py-1 rounded-xl">路口看灯 {round}/{need}</p>
+      <p className="relative z-10 text-lg font-black bg-card/90 px-3 py-1 rounded-xl">
+        {light === 'red' ? '前面是红灯' : '前面是绿灯'}
+      </p>
+      <div className="relative z-10 text-5xl">🚙</div>
+      <LightChoices light={light} locked={picked !== null} picked={picked} correct={correct} onPick={check} />
     </div>
   );
 };
@@ -409,37 +393,42 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
 // ===================== MAIN TRAFFIC PAGE =====================
 
 const TrafficPage: React.FC = () => {
-  const navigate = useNavigate();
   const { addStars, addBadge, addKnowledge, completeStation, currentProfile } = useGame();
+  const age = getAgeConfig(currentProfile?.ageBand);
   const [currentLevel, setCurrentLevel] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [showWhy, setShowWhy] = useState<number | null>(null);
-  const maxLevels = currentProfile?.ageBand === 'sprout' ? 2 : currentProfile?.ageBand === 'builder' ? 5 : 4;
+  const maxLevels = maxSafetyLevels(currentProfile?.ageBand);
   const visibleLevels = LEVELS.filter(l => l.id <= maxLevels);
 
   const handleLevelComplete = useCallback((levelId: number) => {
-    // Show "Why?" prompt after completing a level
-    setShowWhy(levelId);
-  }, []);
-
-  const handleWhyDone = useCallback((levelId: number) => {
-    setShowWhy(null);
     setCompleted(prev => {
+      if (prev.has(levelId)) return prev;
       const next = new Set(prev);
       next.add(levelId);
       addStars(3);
       if (levelId === 1) addKnowledge('park-safe');
-      if (levelId === 2) addKnowledge('stop-go');
+      if (levelId === 2 || levelId === 5) addKnowledge('stop-go');
       if (levelId === 4) addKnowledge('crosswalk');
-      if (next.size >= maxLevels) {
+      if (safetyStationCleared(next.size, maxLevels)) {
         addBadge('safety-guard');
         completeStation('safety');
         speak('你已经会保护自己过马路啦');
       }
       return next;
     });
-    setTimeout(() => setCurrentLevel(0), 1500);
-  }, [addStars, addBadge, addKnowledge, completeStation, maxLevels]);
+    if (age.id === 'builder' && WHY_PROMPTS[levelId]) {
+      setShowWhy(levelId);
+      return;
+    }
+    setTimeout(() => { setCurrentLevel(0); setShowWhy(null); }, 800);
+  }, [addStars, addBadge, addKnowledge, completeStation, maxLevels, age.id]);
+
+  const handleWhyDone = useCallback(() => {
+    addStars(1);
+    setShowWhy(null);
+    setTimeout(() => setCurrentLevel(0), 600);
+  }, [addStars]);
 
   const renderLevel = () => {
     switch (currentLevel) {
@@ -499,7 +488,7 @@ const TrafficPage: React.FC = () => {
                 <WhyPrompt
                   question={WHY_PROMPTS[showWhy].question}
                   options={WHY_PROMPTS[showWhy].options}
-                  onDone={() => handleWhyDone(showWhy)}
+                  onDone={handleWhyDone}
                 />
               )}
             </div>

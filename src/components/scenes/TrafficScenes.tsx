@@ -2,7 +2,7 @@ import React from 'react';
 
 // Parking lot scene background
 export const ParkingLotScene: React.FC = React.memo(() => (
-  <svg viewBox="0 0 300 200" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+  <svg viewBox="0 0 300 200" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice">
     {/* Sky */}
     <rect x="0" y="0" width="300" height="80" fill="hsl(200,70%,85%)" />
     <circle cx="260" cy="30" r="18" fill="hsl(48,95%,70%)" />
@@ -44,7 +44,7 @@ export const ParkingLotScene: React.FC = React.memo(() => (
 
 // Road intersection scene
 export const IntersectionScene: React.FC = React.memo(() => (
-  <svg viewBox="0 0 300 200" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+  <svg viewBox="0 0 300 200" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice">
     <rect x="0" y="0" width="300" height="200" fill="hsl(142,30%,70%)" />
     {/* Horizontal road */}
     <rect x="0" y="75" width="300" height="50" fill="hsl(220,10%,40%)" />
@@ -97,7 +97,7 @@ export const RoadWithCarsScene: React.FC<{ carCount: number }> = React.memo(({ c
 
 // Crosswalk scene
 export const CrosswalkScene: React.FC = React.memo(() => (
-  <svg viewBox="0 0 300 130" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+  <svg viewBox="0 0 300 130" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice">
     {/* Sidewalks */}
     <rect x="0" y="0" width="300" height="30" fill="hsl(30,20%,70%)" />
     <rect x="0" y="100" width="300" height="30" fill="hsl(30,20%,70%)" />
@@ -118,7 +118,7 @@ export const CrosswalkScene: React.FC = React.memo(() => (
 
 // Driving road scene
 export const DrivingRoadScene: React.FC = React.memo(() => (
-  <svg viewBox="0 0 160 260" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice">
+  <svg viewBox="0 0 160 260" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice">
     {/* Grass sides */}
     <rect x="0" y="0" width="20" height="260" fill="hsl(142,35%,60%)" />
     <rect x="140" y="0" width="20" height="260" fill="hsl(142,35%,60%)" />
