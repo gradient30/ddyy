@@ -168,7 +168,7 @@ const FactoryPage: React.FC = () => {
         ) : null}
 
         {mode === 'select' && (
-          <div className="flex-1 min-h-0 overflow-auto max-w-2xl mx-auto w-full space-y-3">
+          <div className="flex-1 min-h-0 overflow-auto w-full grid md:grid-cols-2 gap-3 content-center">
             <button
               onClick={() => { playClick(); setMode('tutorial'); setTypeSelected(false); setMascotMsg('先选一种道闸'); }}
               className="w-full rounded-3xl bg-gradient-to-r from-sky to-grass text-primary-foreground p-5 text-left shadow-lg active:scale-[0.99]"
@@ -187,7 +187,7 @@ const FactoryPage: React.FC = () => {
         )}
 
         {mode === 'tutorial' && !typeSelected && (
-          <div className="flex-1 min-h-0 overflow-auto max-w-2xl mx-auto w-full grid gap-3">
+          <div className="flex-1 min-h-0 overflow-auto w-full grid md:grid-cols-3 gap-3 content-center">
             {barrierTypes.map(t => (
               <button key={t.id} onClick={() => handleStartTutorial(t.id)}
                 className="rounded-2xl bg-card shadow-md p-4 flex items-center gap-4 active:scale-[0.99]">
@@ -202,7 +202,7 @@ const FactoryPage: React.FC = () => {
         )}
 
         {mode === 'tutorial' && typeSelected && (
-          <div className="shrink-0 max-w-2xl mx-auto w-full">
+          <div className="shrink-0 w-full">
             <div className="flex gap-1 mb-2 justify-center">
               {buildSteps.map((s, i) => (
                 <div key={s.id} className={`h-1.5 flex-1 rounded-full ${i <= tutorialStep ? 'bg-sky' : 'bg-muted'}`} />

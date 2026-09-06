@@ -22,8 +22,8 @@ const CollectionPage: React.FC = () => {
   const know = currentProfile.knowledgeIds;
 
   return (
-    <div className="app-stage paper-page p-4 pt-14 overflow-auto">
-      <div className="max-w-3xl mx-auto">
+    <div className="app-stage paper-page">
+      <div className="app-stage-body px-3 md:px-6 pb-4">
         <div className="flex items-center gap-3 mb-5">
           <button onClick={() => { playClick(); navigate('/'); }} className="kid-btn touch-target bg-card border border-border px-3" aria-label="回家">←</button>
           <div className="flex-1">

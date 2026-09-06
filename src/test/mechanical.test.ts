@@ -8,12 +8,16 @@ describe('mechanical barrier mapping', () => {
     expect(armKind('arm1')).toBe('straight');
     expect(armKind('arm2')).toBe('folding');
     expect(armKind('arm3')).toBe('fence');
+    expect(armKind('folding')).toBe('folding');
+    expect(armKind('fence')).toBe('fence');
     expect(armKind(undefined)).toBeNull();
   });
 
   it('keeps red-white as the default boom paint', () => {
     expect(paintColors(undefined).fill).toBe('#D63B32');
+    expect(paintColors('paint1').fill).toBe('#D63B32');
     expect(paintColors('paint2').stripe).toBe('#F4D35E');
+    expect(paintColors('paint3').fill).toBe('url(#mbRainbow)');
   });
 });
 

@@ -144,6 +144,15 @@
   50% { filter: drop-shadow(0 0 20px hsl(var(--sky-blue) / 0.8)); }
 }
 
+@keyframes mb-motor-spin {
+  to { transform: rotate(360deg); }
+}
+
+.mb-motor-spin {
+  animation: mb-motor-spin 0.38s linear infinite;
+  transform-box: view-box;
+}
+
 @keyframes barrier-lift {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(-90deg); }

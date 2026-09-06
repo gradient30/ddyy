@@ -87,7 +87,7 @@ export function MechanicalBarrier({ slots, running = false, className }: Mechani
       )}
 
       {slots.motor && (
-        <g className="animate-pop-in" style={running ? { transformOrigin: `${shaft.x}px ${shaft.y}px` } : undefined}>
+        <g className="animate-pop-in">
           {slots.motor === 'motor2' && (
             <g>
               <rect x="58" y="36" width="68" height="22" rx="2" fill="#163A62" />
@@ -96,24 +96,36 @@ export function MechanicalBarrier({ slots, running = false, className }: Mechani
               ))}
             </g>
           )}
-          <circle cx={shaft.x} cy={shaft.y} r="22" fill="#2E8AAB" />
-          <circle cx={shaft.x} cy={shaft.y} r="14" fill="#1F5F78" />
-          {[0, 45, 90, 135].map(deg => (
-            <rect
-              key={deg}
-              x={shaft.x - 2}
-              y={shaft.y - 20}
-              width="4"
-              height="8"
-              rx="1"
-              fill="#F4D35E"
-              transform={`rotate(${deg + (running ? 25 : 0)} ${shaft.x} ${shaft.y})`}
-            />
-          ))}
-          <circle cx={shaft.x} cy={shaft.y} r="6" fill="#D8DEE4" />
-          <circle cx={shaft.x} cy={shaft.y} r="2.5" fill="#3D4450" />
+          <g
+            className={running ? 'mb-motor-spin' : undefined}
+            style={{ transformOrigin: `${shaft.x}px ${shaft.y}px` }}
+          >
+            <circle cx={shaft.x} cy={shaft.y} r="22" fill="#2E8AAB" />
+            <circle cx={shaft.x} cy={shaft.y} r="14" fill="#1F5F78" />
+            {[0, 45, 90, 135].map(deg => (
+              <rect
+                key={deg}
+                x={shaft.x - 2}
+                y={shaft.y - 20}
+                width="4"
+                height="8"
+                rx="1"
+                fill="#F4D35E"
+                transform={`rotate(${deg} ${shaft.x} ${shaft.y})`}
+              />
+            ))}
+            <circle cx={shaft.x} cy={shaft.y} r="6" fill="#D8DEE4" />
+            <circle cx={shaft.x} cy={shaft.y} r="2.5" fill="#3D4450" />
+          </g>
         </g>
       )}
+
+      {/* 落杆橡胶缓冲垫：杆臂落到这里，而不是悬空 */}
+      <g>
+        <rect x="352" y="168" width="14" height="14" rx="1" fill="#4E575F" />
+        <rect x="346" y="154" width="26" height="16" rx="5" fill="#2B3138" />
+        <rect x="348" y="156" width="22" height="8" rx="4" fill="#1A1F24" />
+      </g>
 
       {kind && (
         <g
