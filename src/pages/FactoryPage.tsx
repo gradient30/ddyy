@@ -132,6 +132,7 @@ const FactoryPage: React.FC = () => {
   };
 
   const handleTestRun = () => {
+    if (isRunning) return;
     if (!slots.arm || !slots.motor) {
       playError();
       setMascotMsg('电机和杆子都装好，才能抬起来');

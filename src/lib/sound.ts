@@ -13,7 +13,7 @@ function withAudio(fn: (ctx: AudioContext) => void): void {
   if (!getAudioFlags().sound) return;
   try {
     const ctx = getCtx();
-    if (ctx.state === 'suspended') void ctx.resume();
+    if (ctx.state === 'suspended') void ctx.resume().catch(() => { /* resume may be blocked */ });
     fn(ctx);
   } catch {
     /* Web Audio may be blocked */
