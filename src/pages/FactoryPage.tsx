@@ -108,7 +108,7 @@ const BuiltBarrierSVG: React.FC<{ slots: Record<string, string>; isRunning: bool
 
 const FactoryPage: React.FC = () => {
   const navigate = useNavigate();
-  const { addStars, addBadge } = useGame();
+  const { addStars, addBadge, addKnowledge, completeStation } = useGame();
   const [mode, setMode] = useState<'select' | 'tutorial' | 'free' | 'done'>('select');
   const [selectedType, setSelectedType] = useState<BarrierType>('straight');
   const [tutorialStep, setTutorialStep] = useState(0);
@@ -146,7 +146,9 @@ const FactoryPage: React.FC = () => {
       setMascotMsg('太棒了！道闸建好了！试试运行吧！');
       playSuccess();
       addStars(5);
-      addBadge('🏗️ 小小工程师');
+      addBadge('engineer');
+      addKnowledge('assemble');
+      completeStation('engineer');
       speak('太棒了！道闸建好了！', 'zh-CN', 0.85);
     }
   };
@@ -169,7 +171,9 @@ const FactoryPage: React.FC = () => {
     setMascotMsg('你自己组装了一个道闸！太厉害了！');
     playSuccess();
     addStars(8);
-    addBadge('🔧 创意建造师');
+    addBadge('creative-builder');
+    addKnowledge('assemble');
+    completeStation('engineer');
     speak('你自己组装了一个道闸！太厉害了！', 'zh-CN', 0.85);
   };
 

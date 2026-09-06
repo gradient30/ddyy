@@ -314,19 +314,24 @@ const TreasureScene: React.FC<{ level: TreasureLevel; onComplete: () => void }> 
 // ===================== MAIN TREASURE PAGE =====================
 
 const TreasurePage: React.FC = () => {
-  const { addStars, addBadge } = useGame();
+  const { addStars, addBadge, addKnowledge, completeStation, currentProfile } = useGame();
   const [activeLevel, setActiveLevel] = useState<number | null>(null);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
 
+  const maxLevels = currentProfile?.ageBand === 'sprout' ? 2 : currentProfile?.ageBand === 'builder' ? 5 : 4;
+  const visibleLevels = LEVELS.filter(l => l.id <= maxLevels);
+
   const handleComplete = useCallback((levelId: number) => {
     setCompleted(prev => { const n = new Set(prev); n.add(levelId); return n; });
-    addStars(4); // Extra for assembly
-    if (completed.size + 1 === LEVELS.length) {
-      addBadge('寻宝大师');
-      speak('恭喜！获得寻宝大师徽章！');
+    addStars(4);
+    addKnowledge('observe-find');
+    if (completed.size + 1 >= maxLevels) {
+      addBadge('observer');
+      completeStation('observe');
+      speak('你的眼睛越来越亮啦');
     }
     setTimeout(() => setActiveLevel(null), 2000);
-  }, [addStars, addBadge, completed.size]);
+  }, [addStars, addBadge, addKnowledge, completeStation, completed.size, maxLevels]);
 
   return (
     <>
@@ -337,12 +342,12 @@ const TreasurePage: React.FC = () => {
             <>
               <div className="text-center mb-6">
                 <XiaoZhaZha mood="excited" size={80} />
-                <h1 className="text-3xl font-black text-foreground mt-2">🗺️ 寻宝乐园</h1>
-                <p className="text-muted-foreground">找零件，拼道闸！</p>
-                <p className="text-sm text-muted-foreground/70">已完成 {completed.size}/{LEVELS.length}</p>
+                <h1 className="text-3xl font-black text-foreground mt-2">观察花园</h1>
+                <p className="text-muted-foreground">先找到，再放到对的位置。</p>
+                <p className="text-sm text-muted-foreground/70">已完成 {completed.size}/{maxLevels}</p>
               </div>
               <div className="grid gap-3">
-                {LEVELS.map(level => (
+                {visibleLevels.map(level => (
                   <button key={level.id}
                     onClick={() => { playClick(); setActiveLevel(level.id); }}
                     className={`flex items-center gap-4 p-4 rounded-3xl transition-all active:scale-[0.97] ${

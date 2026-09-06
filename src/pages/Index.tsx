@@ -6,10 +6,10 @@ import GlobalNav from '@/components/nav/GlobalNav';
 import RestMode from '@/components/timer/RestMode';
 
 const Index: React.FC = () => {
-  const { state, isResting } = useGame();
+  const { state, currentProfile, isResting } = useGame();
 
   if (isResting) return <RestMode />;
-  if (state.currentProfileId === null) return <ProfileSelect />;
+  if (state.currentProfileId === null || !currentProfile?.ageChosen) return <ProfileSelect />;
 
   return (
     <>

@@ -241,17 +241,19 @@ const StoryReader: React.FC<{ story: Story; onFinish: (badge?: string) => void }
 // ===================== MAIN STORY PAGE =====================
 
 const StoryPage: React.FC = () => {
-  const { addStars, addBadge } = useGame();
+  const { addStars, addBadge, addKnowledge, completeStation } = useGame();
   const [activeStory, setActiveStory] = useState<number | null>(null);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
 
   const handleFinish = useCallback((storyId: number, badge?: string) => {
     setCompleted(prev => { const n = new Set(prev); n.add(storyId); return n; });
     addStars(3);
-    if (badge) addBadge(badge);
+    if (badge) addBadge('storyteller');
+    addKnowledge('story-choice');
     if (completed.size + 1 === 5) {
-      addBadge('故事大王');
-      speak('恭喜！获得故事大王徽章！');
+      addBadge('storyteller');
+      completeStation('express');
+      speak('你会听故事，也会做选择');
     }
     setTimeout(() => setActiveStory(null), 1500);
   }, [addStars, addBadge, completed.size]);

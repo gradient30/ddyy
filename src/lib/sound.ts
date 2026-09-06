@@ -1,5 +1,7 @@
 // 道闸乐园 - Web Audio API 程序化音效
 
+import { getAudioFlags } from '@/lib/audio-flags';
+
 let audioCtx: AudioContext | null = null;
 
 function getCtx(): AudioContext {
@@ -8,6 +10,7 @@ function getCtx(): AudioContext {
 }
 
 export function playClick(): void {
+  if (!getAudioFlags().sound) return;
   try {
     const ctx = getCtx();
     const osc = ctx.createOscillator();
@@ -24,6 +27,7 @@ export function playClick(): void {
 }
 
 export function playSuccess(): void {
+  if (!getAudioFlags().sound) return;
   try {
     const ctx = getCtx();
     [523, 659, 784].forEach((freq, i) => {
@@ -43,6 +47,7 @@ export function playSuccess(): void {
 }
 
 export function playError(): void {
+  if (!getAudioFlags().sound) return;
   try {
     const ctx = getCtx();
     const osc = ctx.createOscillator();
@@ -59,6 +64,7 @@ export function playError(): void {
 }
 
 export function playStarCollect(): void {
+  if (!getAudioFlags().sound) return;
   try {
     const ctx = getCtx();
     [880, 1100, 1320, 1760].forEach((freq, i) => {
@@ -78,6 +84,7 @@ export function playStarCollect(): void {
 }
 
 export function playBarrierLift(): void {
+  if (!getAudioFlags().sound) return;
   try {
     const ctx = getCtx();
     const osc = ctx.createOscillator();
@@ -95,6 +102,7 @@ export function playBarrierLift(): void {
 }
 
 export function vibrate(ms = 50): void {
+  if (!getAudioFlags().vibrate) return;
   try {
     if ('vibrate' in navigator) navigator.vibrate(ms);
   } catch {}

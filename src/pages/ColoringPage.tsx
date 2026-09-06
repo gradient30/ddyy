@@ -302,7 +302,7 @@ function drawBarrierTemplate(ctx: CanvasRenderingContext2D, templateId: string, 
 
 const ColoringPage: React.FC = () => {
   const navigate = useNavigate();
-  const { addStars, addBadge } = useGame();
+  const { addStars, addBadge, addKnowledge, completeStation } = useGame();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [currentColor, setCurrentColor] = useState('#FF6B6B');
@@ -380,7 +380,9 @@ const ColoringPage: React.FC = () => {
     playSuccess();
     vibrate(80);
     addStars(3);
-    addBadge('🎨 小画家');
+    addBadge('artist');
+    addKnowledge('express-color');
+    completeStation('express');
     speak('好漂亮的作品！', 'zh-CN', 0.85);
   };
 

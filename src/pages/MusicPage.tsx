@@ -86,7 +86,7 @@ const PADS = [
 ];
 
 const MusicPage: React.FC = () => {
-  const { addStars, addBadge } = useGame();
+  const { addStars, addBadge, addKnowledge, completeStation } = useGame();
   const [barrierAngle, setBarrierAngle] = useState(0);
   const [hitCount, setHitCount] = useState(0);
   const [activePattern, setActivePattern] = useState<number | null>(null);
@@ -114,12 +114,14 @@ const MusicPage: React.FC = () => {
         addStars(1);
       }
       if (next === 50) {
-        addBadge('节奏小鼓手');
-        speak('太棒了！获得节奏小鼓手徽章！');
+        addBadge('musician');
+        addKnowledge('express-beat');
+        completeStation('express');
+        speak('节拍稳住了，收进成长手册啦');
       }
       return next;
     });
-  }, [addStars, addBadge]);
+  }, [addStars, addBadge, addKnowledge, completeStation]);
 
   const playPattern = (idx: number) => {
     if (playing) {

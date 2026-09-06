@@ -1,5 +1,18 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
-import { GameState, loadGameState, saveGameState, addStars as addStarsUtil, addBadge as addBadgeUtil, addLearnedWord as addLearnedWordUtil, getCurrentProfile, ChildProfile } from '@/lib/storage';
+import type { AgeBand } from '@/data/age';
+import { setAudioFlags } from '@/lib/audio-flags';
+import {
+  GameState,
+  loadGameState,
+  saveGameState,
+  addStars as addStarsUtil,
+  addBadge as addBadgeUtil,
+  addLearnedWord as addLearnedWordUtil,
+  addKnowledge as addKnowledgeUtil,
+  completeStation as completeStationUtil,
+  getCurrentProfile,
+  ChildProfile,
+} from '@/lib/storage';
 
 interface GameContextType {
   state: GameState;
@@ -9,8 +22,10 @@ interface GameContextType {
   addStars: (count: number) => void;
   addBadge: (badge: string) => void;
   addLearnedWord: (word: string) => void;
+  addKnowledge: (id: string) => void;
+  completeStation: (id: string) => void;
   updateSettings: (settings: Partial<GameState['globalSettings']>) => void;
-  // Timer
+  updateAgeBand: (band: AgeBand) => void;
   timerSeconds: number;
   isResting: boolean;
   restSeconds: number;
@@ -20,34 +35,53 @@ interface GameContextType {
 
 const GameContext = createContext<GameContextType | null>(null);
 
+function syncAudioFlags(settings: GameState['globalSettings']) {
+  setAudioFlags({
+    sound: settings.soundEnabled,
+    voice: settings.voiceEnabled,
+    vibrate: settings.vibrationEnabled,
+  });
+}
+
 export function GameProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<GameState>(loadGameState);
+  const [state, setState] = useState<GameState>(() => {
+    const loaded = loadGameState();
+    syncAudioFlags(loaded.globalSettings);
+    return loaded;
+  });
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [isResting, setIsResting] = useState(false);
   const [restSeconds, setRestSeconds] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const restRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const PLAY_DURATION = 15 * 60; // 15 minutes
-  const REST_DURATION = 10 * 60; // 10 minutes
+  const PLAY_DURATION = 15 * 60;
+  const REST_DURATION = 10 * 60;
 
   const currentProfile = getCurrentProfile(state);
 
   const selectProfile = useCallback((id: number) => {
-    const newState = { ...state, currentProfileId: id };
-    setState(newState);
-    saveGameState(newState);
+    setState(prev => {
+      const profiles = prev.profiles.map(p =>
+        p.id === id ? { ...p, lastPlayedAt: new Date().toISOString() } : p,
+      );
+      const next = { ...prev, currentProfileId: id, profiles };
+      saveGameState(next);
+      return next;
+    });
     setTimerSeconds(0);
-  }, [state]);
+  }, []);
 
   const logout = useCallback(() => {
-    const newState = { ...state, currentProfileId: null };
-    setState(newState);
-    saveGameState(newState);
+    setState(prev => {
+      const next = { ...prev, currentProfileId: null };
+      saveGameState(next);
+      return next;
+    });
     if (timerRef.current) clearInterval(timerRef.current);
     setTimerSeconds(0);
     setIsResting(false);
-  }, [state]);
+  }, []);
 
   const addStars = useCallback((count: number) => {
     setState(prev => addStarsUtil(prev, count));
@@ -61,11 +95,33 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     setState(prev => addLearnedWordUtil(prev, word));
   }, []);
 
+  const addKnowledge = useCallback((id: string) => {
+    setState(prev => addKnowledgeUtil(prev, id));
+  }, []);
+
+  const completeStationFn = useCallback((id: string) => {
+    setState(prev => completeStationUtil(prev, id));
+  }, []);
+
   const updateSettings = useCallback((settings: Partial<GameState['globalSettings']>) => {
     setState(prev => {
-      const newState = { ...prev, globalSettings: { ...prev.globalSettings, ...settings } };
-      saveGameState(newState);
-      return newState;
+      const globalSettings = { ...prev.globalSettings, ...settings };
+      syncAudioFlags(globalSettings);
+      const next = { ...prev, globalSettings };
+      saveGameState(next);
+      return next;
+    });
+  }, []);
+
+  const updateAgeBand = useCallback((band: AgeBand) => {
+    setState(prev => {
+      if (prev.currentProfileId === null) return prev;
+      const profiles = prev.profiles.map(p =>
+        p.id === prev.currentProfileId ? { ...p, ageBand: band, ageChosen: true } : p,
+      );
+      const next = { ...prev, profiles };
+      saveGameState(next);
+      return next;
     });
   }, []);
 
@@ -92,7 +148,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     startTimer();
   }, [startTimer]);
 
-  // Rest countdown
   useEffect(() => {
     if (isResting) {
       restRef.current = setInterval(() => {
@@ -112,7 +167,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     };
   }, [isResting, resetTimer]);
 
-  // Start timer when profile selected
   useEffect(() => {
     if (state.currentProfileId !== null && state.globalSettings.timerEnabled) {
       startTimer();
@@ -125,7 +179,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   return (
     <GameContext.Provider value={{
       state, currentProfile, selectProfile, logout,
-      addStars, addBadge, addLearnedWord, updateSettings,
+      addStars, addBadge, addLearnedWord, addKnowledge,
+      completeStation: completeStationFn, updateSettings, updateAgeBand,
       timerSeconds, isResting, restSeconds, startTimer, resetTimer,
     }}>
       {children}

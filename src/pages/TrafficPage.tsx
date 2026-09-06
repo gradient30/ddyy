@@ -409,10 +409,12 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
 
 const TrafficPage: React.FC = () => {
   const navigate = useNavigate();
-  const { addStars, addBadge } = useGame();
+  const { addStars, addBadge, addKnowledge, completeStation, currentProfile } = useGame();
   const [currentLevel, setCurrentLevel] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [showWhy, setShowWhy] = useState<number | null>(null);
+  const maxLevels = currentProfile?.ageBand === 'sprout' ? 2 : currentProfile?.ageBand === 'builder' ? 5 : 4;
+  const visibleLevels = LEVELS.filter(l => l.id <= maxLevels);
 
   const handleLevelComplete = useCallback((levelId: number) => {
     // Show "Why?" prompt after completing a level
@@ -424,15 +426,19 @@ const TrafficPage: React.FC = () => {
     setCompleted(prev => {
       const next = new Set(prev);
       next.add(levelId);
-      addStars(3); // Extra star for thinking!
-      if (next.size === 5) {
-        addBadge('交通小英雄');
-        speak('恭喜你！获得交通小英雄徽章！');
+      addStars(3);
+      if (levelId === 1) addKnowledge('park-safe');
+      if (levelId === 2) addKnowledge('stop-go');
+      if (levelId === 4) addKnowledge('crosswalk');
+      if (next.size >= maxLevels) {
+        addBadge('safety-guard');
+        completeStation('safety');
+        speak('你已经会保护自己过马路啦');
       }
       return next;
     });
     setTimeout(() => setCurrentLevel(0), 1500);
-  }, [addStars, addBadge]);
+  }, [addStars, addBadge, addKnowledge, completeStation, maxLevels]);
 
   const renderLevel = () => {
     switch (currentLevel) {
@@ -453,12 +459,12 @@ const TrafficPage: React.FC = () => {
           <div className="max-w-md mx-auto">
             <div className="text-center mb-6">
               <XiaoZhaZha mood="excited" size={80} />
-              <h1 className="text-3xl font-black text-foreground mt-2">🚦 交通英雄城</h1>
-              <p className="text-muted-foreground">完成5关，成为交通小英雄！</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">已完成 {completed.size}/5 关</p>
+              <h1 className="text-3xl font-black text-foreground mt-2">安全街道</h1>
+              <p className="text-muted-foreground">红灯停，绿灯行。先学会保护自己。</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">已完成 {completed.size}/{maxLevels} 关</p>
             </div>
             <div className="grid gap-3">
-              {LEVELS.map(level => (
+              {visibleLevels.map(level => (
                 <button key={level.id}
                   onClick={() => { playClick(); setCurrentLevel(level.id); speak(level.rule); }}
                   className={`flex items-center gap-4 p-4 rounded-3xl transition-all active:scale-[0.97] ${
@@ -468,12 +474,10 @@ const TrafficPage: React.FC = () => {
                   <div className="text-left flex-1">
                     <p className="font-bold text-foreground">{level.title}</p>
                     <p className="text-sm text-muted-foreground">{level.rule}</p>
-                    <p className="text-xs text-muted-foreground/60">{level.ruleEn}</p>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="text-lg">{completed.has(level.id) ? '⭐' : '🔒'}</span>
+                    <span className="text-lg">{completed.has(level.id) ? '✓' : '○'}</span>
                     <span className="text-xs font-bold text-foreground">{level.word}</span>
-                    <span className="text-xs text-muted-foreground">{level.wordEn}</span>
                   </div>
                 </button>
               ))}

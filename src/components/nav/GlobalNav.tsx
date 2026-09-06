@@ -26,7 +26,7 @@ const GlobalNav: React.FC = () => {
   if (!currentProfile) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border px-3 md:px-6 py-2 md:py-3 flex items-center gap-3 md:gap-4">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-b border-border px-3 md:px-6 py-2 md:py-3 flex items-center gap-3 md:gap-4">
       {/* 回家按钮 */}
       <button onClick={handleHome} className="touch-target rounded-2xl bg-primary/10 hover:bg-primary/20 active:scale-95 transition-all px-3 py-1 text-2xl md:text-3xl" aria-label="回到首页">
         🏠
@@ -36,7 +36,7 @@ const GlobalNav: React.FC = () => {
       <div className="flex-1 flex flex-col gap-0.5">
         <div className="h-3 md:h-4 rounded-full bg-muted overflow-hidden">
           <div
-            className="h-full rounded-full rainbow-bar transition-all duration-1000"
+            className="h-full rounded-full bg-gradient-to-r from-primary to-golden transition-all duration-1000"
             style={{ width: `${100 - progress}%` }}
           />
         </div>

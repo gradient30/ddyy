@@ -183,11 +183,20 @@ const CountryCard: React.FC<{ country: BarrierCountry; onClose: () => void; onVi
 
 // ===================== MAIN PAGE =====================
 
+const SPROUT_IDS = ['cn', 'jp', 'au', 'in', 'fr'];
+const EXPLORER_IDS = [...SPROUT_IDS, 'us', 'de', 'ke', 'br', 'kr'];
+
 const WorldTourPage: React.FC = () => {
   const navigate = useNavigate();
-  const { addStars, addBadge } = useGame();
+  const { addStars, addBadge, addKnowledge, completeStation, currentProfile } = useGame();
   const [visited, setVisited] = useState<Set<string>>(new Set());
   const [selectedCountry, setSelectedCountry] = useState<BarrierCountry | null>(null);
+  const visible = currentProfile?.ageBand === 'sprout'
+    ? countries.filter(c => SPROUT_IDS.includes(c.id))
+    : currentProfile?.ageBand === 'builder'
+      ? countries
+      : countries.filter(c => EXPLORER_IDS.includes(c.id));
+  const goal = visible.length;
 
   const handleVisited = (id: string) => {
     const newVisited = new Set(visited);
@@ -197,8 +206,10 @@ const WorldTourPage: React.FC = () => {
       addStars(2);
       playStarCollect();
       vibrate(50);
-      if (newVisited.size >= 15) {
-        addBadge('🌍 环球小旅行家');
+      if (newVisited.size >= goal) {
+        addBadge('world-traveler');
+        addKnowledge('world-same-different');
+        completeStation('world');
         playSuccess();
       }
     }
@@ -209,34 +220,34 @@ const WorldTourPage: React.FC = () => {
       <GlobalNav />
       <div className="min-h-screen bg-gradient-to-b from-grass/15 via-background to-sky/10 pt-20 pb-8 px-4">
         <div className="text-center mb-4">
-          <h1 className="text-3xl md:text-4xl font-black text-foreground">🌍 世界巡游岛</h1>
+          <h1 className="text-3xl md:text-4xl font-black text-foreground">世界花园</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            点击国旗探索全球道闸！已探索 {visited.size}/15 个国家
+            大门各地不一样，但都是为了安全。已认识 {visited.size}/{goal} 个地方
           </p>
           <div className="max-w-xs mx-auto mt-2 h-4 rounded-full bg-muted overflow-hidden">
             <div className="h-full rounded-full bg-gradient-to-r from-sky to-grass transition-all duration-500"
-              style={{ width: `${(visited.size / 15) * 100}%` }} />
+              style={{ width: `${(visited.size / goal) * 100}%` }} />
           </div>
         </div>
 
         <div className="flex items-center justify-center gap-3 mb-4">
-          <XiaoZhaZha mood={visited.size >= 15 ? 'excited' : 'happy'} size={50} />
+          <XiaoZhaZha mood={visited.size >= goal ? 'excited' : 'happy'} size={50} />
           <div className="bg-card rounded-2xl px-4 py-2 shadow-sm max-w-xs">
             <p className="text-sm font-bold text-foreground">
-              {visited.size === 0 && '点击地图上的国旗，看看那里的道闸长什么样！'}
-              {visited.size > 0 && visited.size < 15 && `太棒了！还有${15 - visited.size}个国家等你探索！`}
-              {visited.size >= 15 && '🎉 你已经集齐15国！获得"环球小旅行家"徽章！'}
+              {visited.size === 0 && '点一面旗，看看那里的大门为什么这样长。'}
+              {visited.size > 0 && visited.size < goal && `很好！还差 ${goal - visited.size} 个地方。`}
+              {visited.size >= goal && '不同的大门，同一句话：为了安全。'}
             </p>
           </div>
         </div>
 
-        <GlobeView countries={countries} visited={visited} onSelect={setSelectedCountry} />
+        <GlobeView countries={visible} visited={visited} onSelect={setSelectedCountry} />
 
         {visited.size > 0 && (
           <div className="mt-6 text-center">
             <h3 className="text-lg font-bold text-foreground mb-2">🏆 已收集</h3>
             <div className="flex flex-wrap gap-2 justify-center">
-              {countries.filter(c => visited.has(c.id)).map(c => (
+              {visible.filter(c => visited.has(c.id)).map(c => (
                 <span key={c.id} className="text-3xl animate-pop-in" title={c.country}>{c.flag}</span>
               ))}
             </div>

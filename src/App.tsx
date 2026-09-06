@@ -9,7 +9,6 @@ const Index = React.lazy(() => import("./pages/Index"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const WelcomePage = React.lazy(() => import("./pages/WelcomePage"));
 const WorldTourPage = React.lazy(() => import("./pages/WorldTourPage"));
-const PlaceholderPage = React.lazy(() => import("./pages/PlaceholderPage"));
 const FactoryPage = React.lazy(() => import("./pages/FactoryPage"));
 const ColoringPage = React.lazy(() => import("./pages/ColoringPage"));
 const TrafficPage = React.lazy(() => import("./pages/TrafficPage"));
@@ -20,6 +19,8 @@ const StoryPage = React.lazy(() => import("./pages/StoryPage"));
 const TreasurePage = React.lazy(() => import("./pages/TreasurePage"));
 const CollectionPage = React.lazy(() => import("./pages/CollectionPage"));
 const ParentPage = React.lazy(() => import("./pages/ParentPage"));
+const MathPage = React.lazy(() => import("./pages/MathPage"));
+const ExpressPage = React.lazy(() => import("./pages/ExpressPage"));
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,8 @@ const AppContent = () => {
             <Route path="/music" element={<MusicPage />} />
             <Route path="/story" element={<StoryPage />} />
             <Route path="/treasure" element={<TreasurePage />} />
+            <Route path="/math" element={<MathPage />} />
+            <Route path="/express" element={<ExpressPage />} />
             <Route path="/collection" element={<CollectionPage />} />
             <Route path="/parent" element={<ParentPage />} />
             <Route path="*" element={<NotFound />} />
