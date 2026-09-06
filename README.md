@@ -1,73 +1,36 @@
-# Welcome to your Lovable project
+# 道闸乐园 / Barrier Buddies
 
-## Project info
+面向 3–10 岁的儿童 STEM 互动乐园：以道闸为主题，把科学、工程、交通安全、语言、艺术、音乐和故事做成岛屿地图。本地运行，进度存在浏览器 `localStorage`，无广告、无账号。
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 现状
 
-## How can I edit this code?
+可玩的主干在 **`main`**：10 个岛屿 + 收藏馆 + 家长区。  
+`origin/dev` 上有 2026-03 的交接工程方案和 Phase 1–5 脚手架，**不能直接合并**（`App.tsx` 无法构建，多数新模块未接到游戏）。
 
-There are several ways of editing your application.
+后续工作以文档为准，不以进度报告的「已完成」为准：
 
-**Use Lovable**
+- [当前实现掌握](docs/current-state.md)
+- [方案与代码差距](docs/gap-analysis.md)
+- [重构蓝图（从 R0 徽章契约开始）](docs/refactoring-blueprint.md)
+- [历史交接方案](plans/README.md)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 本地开发
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+需要 Node.js 20+。
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+npm run dev      # http://localhost:8080
+npm run test
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## 技术栈
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Vite 5 · React 18 · TypeScript · Tailwind · React Router · 自研 `GameContext` + `localStorage`。
 
-**Use GitHub Codespaces**
+语音用 Web Speech API（`src/lib/speech.ts`），音效用 Web Audio 合成（`src/lib/sound.ts`）。
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 部署
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+GitHub Actions 将 `main` 构建并推到 Cloudflare Pages 项目 `ddyy`。工作流里的 Supabase 环境变量目前没有对应客户端代码。
