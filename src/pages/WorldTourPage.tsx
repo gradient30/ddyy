@@ -50,11 +50,11 @@ const GlobeView: React.FC<{ countries: BarrierCountry[]; visited: Set<string>; o
     <div className="absolute inset-0 flex items-center justify-center opacity-10 text-[200px]">🌍</div>
     {countries.map(c => (
       <button key={c.id} onClick={() => { playClick(); onSelect(c); }}
-        className={`absolute flex flex-col items-center gap-0.5 p-1.5 rounded-xl transition-all duration-300 hover:scale-125 active:scale-95 ${visited.has(c.id) ? 'bg-golden/30 ring-2 ring-golden' : 'bg-card/80 hover:bg-card'} shadow-md`}
+        className={`absolute flex flex-col items-center gap-0.5 p-2 min-w-[64px] rounded-xl transition-all duration-300 hover:scale-110 active:scale-95 ${visited.has(c.id) ? 'bg-golden/30 ring-2 ring-golden' : 'bg-card/90 hover:bg-card'} shadow-md`}
         style={{ left: `${c.x}%`, top: `${c.y}%`, transform: 'translate(-50%,-50%)' }}
         aria-label={c.country}>
-        <span className="text-2xl">{c.flag}</span>
-        <span className="text-[10px] font-bold text-foreground whitespace-nowrap">{c.country}</span>
+        <span className="text-3xl">{c.flag}</span>
+        <span className="text-xs font-extrabold text-foreground whitespace-nowrap">{c.country}</span>
       </button>
     ))}
   </div>

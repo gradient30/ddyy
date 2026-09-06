@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useGame } from '@/contexts/GameContext';
 import GlobalNav from '@/components/nav/GlobalNav';
 import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
+import { PartIcon } from '@/components/parts/PartIcons';
+import { PartTile } from '@/components/parts/PartTile';
 import { playClick, playSuccess, playStarCollect, playBarrierLift, playError, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
 
@@ -58,18 +60,27 @@ const slotNames: Record<string, string> = {
 };
 
 const BuiltBarrierSVG: React.FC<{ slots: Record<string, string>; isRunning: boolean }> = ({ slots, isRunning }) => {
-  const hasBase = !!slots.base;
-  const hasPillar = !!slots.pillar;
-  const hasArm = !!slots.arm;
-  const hasMotor = !!slots.motor;
-  const hasSensor = !!slots.sensor;
-  const hasLight = !!slots.light;
-  const paintColor = slots.paint === '🔴' ? 'hsl(0,72%,60%)' : slots.paint === '🔵' ? 'hsl(210,80%,55%)' : slots.paint === '🌈' ? 'url(#rainbow)' : 'hsl(0,72%,60%)';
+  const baseId = slots.base;
+  const pillarId = slots.pillar;
+  const armId = slots.arm;
+  const motorId = slots.motor;
+  const sensorId = slots.sensor;
+  const lightId = slots.light;
+  const panelId = slots.panel;
+  const paintId = slots.paint;
+  const decoId = slots.deco;
+
+  const paintFill = paintId === 'paint2'
+    ? 'hsl(210,80%,52%)'
+    : paintId === 'paint3'
+      ? 'url(#factoryRainbow)'
+      : 'hsl(0,72%,56%)';
+  const stripeFill = paintId === 'paint2' ? 'hsl(48,95%,58%)' : '#FFF8EE';
 
   return (
-    <svg viewBox="0 0 200 160" className="w-full max-w-xs mx-auto">
+    <svg viewBox="0 0 280 200" className="w-full max-w-md mx-auto">
       <defs>
-        <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient id="factoryRainbow" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="hsl(0,80%,60%)" />
           <stop offset="25%" stopColor="hsl(54,100%,50%)" />
           <stop offset="50%" stopColor="hsl(142,69%,58%)" />
@@ -77,31 +88,104 @@ const BuiltBarrierSVG: React.FC<{ slots: Record<string, string>; isRunning: bool
           <stop offset="100%" stopColor="hsl(270,70%,65%)" />
         </linearGradient>
       </defs>
-      {/* Ground */}
-      <rect x="0" y="140" width="200" height="20" rx="4" fill="hsl(142,30%,75%)" />
-      {/* Base */}
-      {hasBase && <rect x="30" y="120" width="40" height="20" rx="4" fill="hsl(220,15%,45%)" />}
-      {/* Pillar */}
-      {hasPillar && <rect x="40" y="50" width="20" height="70" rx="3" fill="hsl(220,15%,50%)" />}
-      {/* Motor */}
-      {hasMotor && <circle cx="50" cy="55" r="10" fill="hsl(195,100%,50%)" opacity="0.8" />}
-      {/* Arm */}
-      {hasArm && (
-        <g style={{ transformOrigin: '50px 55px', transition: 'transform 1s cubic-bezier(0.34,1.56,0.64,1)', transform: isRunning ? 'rotate(-85deg)' : 'rotate(0deg)' }}>
-          <rect x="50" y="50" width="120" height="10" rx="5" fill={paintColor} />
-          {[70, 95, 120, 145].map(x => <rect key={x} x={x} y="50" width="6" height="10" rx="1" fill="white" opacity="0.5" />)}
-          <circle cx="165" cy="55" r="7" fill="hsl(54,100%,50%)" />
+      <rect x="0" y="172" width="280" height="28" rx="6" fill="hsl(142,32%,72%)" />
+      <rect x="0" y="186" width="280" height="8" fill="hsl(30,18%,42%)" />
+
+      {baseId === 'base2' ? (
+        <ellipse cx="70" cy="170" rx="42" ry="16" fill="#5B6570" />
+      ) : baseId ? (
+        <rect x="28" y="154" width="84" height="24" rx="6" fill="#5B6570" />
+      ) : null}
+
+      {pillarId === 'pillar2' ? (
+        <rect x="54" y="62" width="32" height="96" rx="16" fill="#6B7580" />
+      ) : pillarId ? (
+        <rect x="52" y="62" width="36" height="96" rx="6" fill="#6B7580" />
+      ) : null}
+
+      {motorId === 'motor2' ? (
+        <>
+          <rect x="42" y="46" width="56" height="22" rx="3" fill="#1E4A7A" />
+          {[50, 62, 74, 86].map((x) => <line key={x} x1={x} y1="48" x2={x} y2="66" stroke="#49C2E8" strokeWidth="2" />)}
+          <circle cx="70" cy="78" r="16" fill="#3AA0C7" />
+        </>
+      ) : motorId ? (
+        <>
+          <circle cx="70" cy="78" r="20" fill="#3AA0C7" />
+          <circle cx="70" cy="78" r="8" fill="#F4D35E" />
+        </>
+      ) : null}
+
+      {armId && (
+        <g style={{ transformOrigin: '70px 78px', transition: 'transform 1s cubic-bezier(0.34,1.56,0.64,1)', transform: isRunning ? 'rotate(-85deg)' : 'rotate(0deg)' }}>
+          {armId === 'arm3' ? (
+            <>
+              <rect x="70" y="70" width="170" height="6" rx="2" fill="#5B6570" />
+              <rect x="70" y="88" width="170" height="6" rx="2" fill="#5B6570" />
+              {[88, 108, 128, 148, 168, 188, 208].map((x) => (
+                <rect key={x} x={x} y="70" width="7" height="24" rx="2" fill="#7A8490" />
+              ))}
+            </>
+          ) : armId === 'arm2' ? (
+            <>
+              <rect x="70" y="70" width="88" height="16" rx="8" fill={paintFill} />
+              <rect x="150" y="46" width="70" height="14" rx="7" fill={paintFill} transform="rotate(-22 150 53)" />
+              <circle cx="156" cy="78" r="7" fill="#4E575F" />
+            </>
+          ) : (
+            <>
+              <rect x="70" y="70" width="176" height="16" rx="8" fill={paintFill} />
+              {[96, 120, 144, 168, 192, 216].map((x) => (
+                <rect key={x} x={x} y="70" width="10" height="16" fill={stripeFill} />
+              ))}
+              <circle cx="238" cy="78" r="9" fill="#F4D35E" />
+            </>
+          )}
         </g>
       )}
-      {/* Sensor */}
-      {hasSensor && <circle cx="50" cy="75" r="5" fill="hsl(0,80%,60%)" className={isRunning ? 'animate-glow-pulse' : ''} />}
-      {/* Light */}
-      {hasLight && (
+
+      {sensorId === 'sensor2' ? (
+        <g>
+          <path d="M48 108 h10 v16 a8 8 0 0 1-10 0z" fill="#E25B4C" />
+          <path d="M62 108 h10 v16 a8 8 0 0 1-10 0z" fill="#3AA0C7" />
+        </g>
+      ) : sensorId === 'sensor3' ? (
+        <g>
+          <rect x="52" y="104" width="24" height="16" rx="4" fill="#3D4450" />
+          <circle cx="64" cy="112" r="5" fill="#49C2E8" />
+        </g>
+      ) : sensorId ? (
+        <circle cx="64" cy="112" r="9" fill="#E25B4C" className={isRunning ? 'animate-glow-pulse' : ''} />
+      ) : null}
+
+      {lightId === 'light2' ? (
+        <g>
+          {['#E25B4C', '#F4D35E', '#4CAF7A'].map((c, i) => (
+            <circle key={c} cx={56 + i * 12} cy="48" r="6" fill={c} />
+          ))}
+        </g>
+      ) : lightId ? (
         <>
-          <circle cx="50" cy="40" r="6" fill={isRunning ? 'hsl(142,69%,58%)' : 'hsl(0,72%,60%)'} />
-          <circle cx="50" cy="40" r="3" fill="white" opacity="0.5" />
+          <circle cx="70" cy="46" r="10" fill={isRunning ? '#4CAF7A' : '#E25B4C'} />
+          <circle cx="70" cy="46" r="4" fill="white" opacity="0.55" />
         </>
-      )}
+      ) : null}
+
+      {panelId === 'panel2' ? (
+        <rect x="88" y="118" width="28" height="22" rx="4" fill="#4E575F" />
+      ) : panelId === 'panel3' ? (
+        <rect x="92" y="114" width="16" height="28" rx="6" fill="#5B6570" />
+      ) : panelId ? (
+        <g>
+          <rect x="88" y="116" width="30" height="24" rx="4" fill="#4E575F" />
+          <circle cx="97" cy="128" r="4" fill="#4CAF7A" />
+          <circle cx="109" cy="128" r="4" fill="#E25B4C" />
+        </g>
+      ) : null}
+
+      {decoId === 'sticker3' && <circle cx="200" cy="54" r="12" fill="#F4D35E" />}
+      {decoId === 'sticker2' && <rect x="188" y="42" width="24" height="24" rx="8" fill="#49C2E8" />}
+      {decoId === 'sticker1' && <rect x="186" y="46" width="28" height="14" rx="4" fill="#F4D35E" />}
     </svg>
   );
 };
@@ -131,7 +215,7 @@ const FactoryPage: React.FC = () => {
 
   const handleTutorialPlace = () => {
     const step = buildSteps[tutorialStep];
-    const newSlots = { ...slots, [step.slot]: step.emoji };
+    const newSlots = { ...slots, [step.slot]: step.id };
     setSlots(newSlots);
     playStarCollect();
     vibrate(30);
@@ -153,8 +237,8 @@ const FactoryPage: React.FC = () => {
     }
   };
 
-  const handleFreeDrop = useCallback((slot: string, emoji: string) => {
-    setSlots(prev => ({ ...prev, [slot]: emoji }));
+  const handleFreeDrop = useCallback((slot: string, partId: string) => {
+    setSlots(prev => ({ ...prev, [slot]: partId }));
     playStarCollect();
     vibrate(20);
   }, []);
@@ -232,7 +316,7 @@ const FactoryPage: React.FC = () => {
             {barrierTypes.map(t => (
               <button key={t.id} onClick={() => handleStartTutorial(t.id)}
                 className="touch-target rounded-2xl bg-card shadow-md p-4 flex items-center gap-4 hover:scale-[1.02] active:scale-95 transition-all">
-                <span className="text-4xl">{t.emoji}</span>
+                <PartIcon id={t.id === 'folding' ? 'arm2' : t.id === 'fence' ? 'arm3' : 'arm1'} size={72} />
                 <div className="text-left">
                   <h3 className="text-xl font-bold text-foreground">{t.name}</h3>
                   <p className="text-sm text-muted-foreground">{t.desc}</p>
@@ -260,7 +344,9 @@ const FactoryPage: React.FC = () => {
             {/* 当前步骤 */}
             <div className="bg-card rounded-2xl shadow-md p-5 text-center">
               <p className="text-sm text-muted-foreground mb-1">第 {tutorialStep + 1}/{buildSteps.length} 步</p>
-              <div className="text-5xl mb-2">{buildSteps[tutorialStep].emoji}</div>
+              <div className="flex justify-center mb-2">
+                <PartIcon id={buildSteps[tutorialStep].id} size={88} />
+              </div>
               <h3 className="text-2xl font-bold text-foreground mb-1">{buildSteps[tutorialStep].name}</h3>
               <p className="text-base text-muted-foreground mb-4">{buildSteps[tutorialStep].desc}</p>
               <button onClick={handleTutorialPlace}
@@ -280,8 +366,8 @@ const FactoryPage: React.FC = () => {
               {/* 插槽指示 */}
               <div className="flex flex-wrap gap-2 justify-center mt-3">
                 {Object.entries(slotNames).map(([key, name]) => (
-                  <span key={key} className={`px-3 py-1 rounded-full text-xs font-bold ${slots[key] ? 'bg-grass/20 text-foreground' : 'bg-muted text-muted-foreground'}`}>
-                    {slots[key] || '❓'} {name}
+                  <span key={key} className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold ${slots[key] ? 'bg-grass/20 text-foreground' : 'bg-muted text-muted-foreground'}`}>
+                    {slots[key] ? <PartIcon id={slots[key]} size={22} /> : <span>❓</span>} {name}
                   </span>
                 ))}
               </div>
@@ -289,17 +375,16 @@ const FactoryPage: React.FC = () => {
 
             {/* 零件库 */}
             <div className="bg-card rounded-2xl shadow-md p-4 mb-4">
-              <h3 className="text-lg font-bold text-foreground mb-2">🧰 零件库（点击安装）</h3>
-              <div className="grid grid-cols-4 gap-2">
+              <h3 className="text-lg font-bold text-foreground mb-3">🧰 零件库（点一下就能装上）</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {freeParts.map(part => (
-                  <button key={part.id}
-                    onClick={() => { handleFreeDrop(part.slot, part.emoji); setMascotMsg(`安装了${part.name}！`); }}
-                    className={`rounded-xl p-2 text-center transition-all hover:scale-110 active:scale-90 ${
-                      dragPart === part.id ? 'ring-2 ring-sky bg-sky/20' : 'bg-muted/50 hover:bg-muted'
-                    }`}>
-                    <div className="text-2xl">{part.emoji}</div>
-                    <div className="text-[10px] font-bold text-foreground truncate">{part.name}</div>
-                  </button>
+                  <PartTile
+                    key={part.id}
+                    id={part.id}
+                    name={part.name}
+                    selected={slots[part.slot] === part.id || dragPart === part.id}
+                    onClick={() => { handleFreeDrop(part.slot, part.id); setMascotMsg(`安装了${part.name}！`); }}
+                  />
                 ))}
               </div>
             </div>

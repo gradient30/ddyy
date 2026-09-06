@@ -187,6 +187,21 @@
   @apply flex items-center justify-center cursor-pointer select-none;
 }
 
+/* 道闸配件：给小朋友看得清、点得准 */
+.part-tile {
+  min-width: 96px;
+  min-height: 104px;
+  @apply flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 font-extrabold
+    border border-border shadow-[0_4px_12px_hsl(24_20%_20%/0.06)]
+    active:scale-95 transition-transform;
+}
+
+.part-hotspot {
+  min-width: 68px;
+  min-height: 68px;
+  @apply flex items-center justify-center rounded-2xl cursor-pointer select-none;
+}
+
 /* 高对比度模式 */
 .high-contrast {
   --background: 0 0% 0%;

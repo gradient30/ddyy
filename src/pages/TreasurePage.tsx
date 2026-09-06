@@ -1,6 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import GlobalNav from '@/components/nav/GlobalNav';
 import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
+import { PartIcon } from '@/components/parts/PartIcons';
+import { PartTile } from '@/components/parts/PartTile';
 import { useGame } from '@/contexts/GameContext';
 import { playClick, playSuccess, playStarCollect, playError, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
@@ -10,6 +12,7 @@ import { ParkingTreasureScene, MallBasementScene, SchoolGateScene, ParkEntranceS
 
 interface HiddenPart {
   id: string;
+  icon: string;
   emoji: string;
   name: string;
   x: number;
@@ -38,9 +41,9 @@ const LEVELS: TreasureLevel[] = [
     id: 1, scene: '小区停车场', sceneEmoji: '🏘️',
     bgClass: 'from-primary/10 to-accent/10',
     parts: [
-      { id: 'bolt1', emoji: '🔩', name: '螺栓', x: 15, y: 30 },
-      { id: 'gear1', emoji: '⚙️', name: '齿轮', x: 75, y: 60 },
-      { id: 'spring1', emoji: '🌀', name: '弹簧', x: 45, y: 80 },
+      { id: 'bolt1', icon: 'bolt', emoji: '🔩', name: '螺栓', x: 15, y: 30 },
+      { id: 'gear1', icon: 'gear', emoji: '⚙️', name: '齿轮', x: 75, y: 60 },
+      { id: 'spring1', icon: 'spring', emoji: '🌀', name: '弹簧', x: 45, y: 80 },
     ],
     assemblySlots: [
       { id: 'bolt1', label: '固定底座', x: 20, y: 80 },
@@ -52,9 +55,9 @@ const LEVELS: TreasureLevel[] = [
     id: 2, scene: '商场地下室', sceneEmoji: '🏬',
     bgClass: 'from-purple-fun/10 to-primary/10',
     parts: [
-      { id: 'motor1', emoji: '🔌', name: '电线', x: 80, y: 25 },
-      { id: 'panel1', emoji: '🎛️', name: '控制板', x: 20, y: 70 },
-      { id: 'led1', emoji: '💡', name: 'LED灯', x: 55, y: 40 },
+      { id: 'motor1', icon: 'wire', emoji: '🔌', name: '电线', x: 80, y: 25 },
+      { id: 'panel1', icon: 'board', emoji: '🎛️', name: '控制板', x: 20, y: 70 },
+      { id: 'led1', icon: 'led', emoji: '💡', name: 'LED灯', x: 55, y: 40 },
     ],
     assemblySlots: [
       { id: 'motor1', label: '连接电机', x: 30, y: 60 },
@@ -66,9 +69,9 @@ const LEVELS: TreasureLevel[] = [
     id: 3, scene: '学校门口', sceneEmoji: '🏫',
     bgClass: 'from-golden/10 to-grass/10',
     parts: [
-      { id: 'arm1', emoji: '📏', name: '杆臂', x: 30, y: 20 },
-      { id: 'sensor1', emoji: '📡', name: '感应器', x: 70, y: 75 },
-      { id: 'battery1', emoji: '🔋', name: '电池', x: 10, y: 55 },
+      { id: 'arm1', icon: 'arm1', emoji: '📏', name: '杆臂', x: 30, y: 20 },
+      { id: 'sensor1', icon: 'sensor1', emoji: '📡', name: '感应器', x: 70, y: 75 },
+      { id: 'battery1', icon: 'battery', emoji: '🔋', name: '电池', x: 10, y: 55 },
     ],
     assemblySlots: [
       { id: 'arm1', label: '电机上方', x: 65, y: 25 },
@@ -80,9 +83,9 @@ const LEVELS: TreasureLevel[] = [
     id: 4, scene: '公园入口', sceneEmoji: '🌳',
     bgClass: 'from-grass/10 to-golden/10',
     parts: [
-      { id: 'solar1', emoji: '☀️', name: '太阳能板', x: 85, y: 15 },
-      { id: 'hinge1', emoji: '🔗', name: '铰链', x: 40, y: 65 },
-      { id: 'paint1', emoji: '🎨', name: '油漆桶', x: 60, y: 85 },
+      { id: 'solar1', icon: 'solar', emoji: '☀️', name: '太阳能板', x: 85, y: 15 },
+      { id: 'hinge1', icon: 'hinge', emoji: '🔗', name: '铰链', x: 40, y: 65 },
+      { id: 'paint1', icon: 'bucket', emoji: '🎨', name: '油漆桶', x: 60, y: 85 },
     ],
     assemblySlots: [
       { id: 'solar1', label: '顶部', x: 50, y: 15 },
@@ -94,10 +97,10 @@ const LEVELS: TreasureLevel[] = [
     id: 5, scene: '高速收费站', sceneEmoji: '🛣️',
     bgClass: 'from-coral/10 to-primary/10',
     parts: [
-      { id: 'cam1', emoji: '📷', name: '摄像头', x: 25, y: 15 },
-      { id: 'chip1', emoji: '🪫', name: '芯片', x: 65, y: 50 },
-      { id: 'sign1', emoji: '🪧', name: '标志牌', x: 45, y: 30 },
-      { id: 'wire1', emoji: '🧵', name: '线缆', x: 80, y: 80 },
+      { id: 'cam1', icon: 'cam', emoji: '📷', name: '摄像头', x: 25, y: 15 },
+      { id: 'chip1', icon: 'chip', emoji: '🪫', name: '芯片', x: 65, y: 50 },
+      { id: 'sign1', icon: 'sign', emoji: '🪧', name: '标志牌', x: 45, y: 30 },
+      { id: 'wire1', icon: 'cable', emoji: '🧵', name: '线缆', x: 80, y: 80 },
     ],
     assemblySlots: [
       { id: 'cam1', label: '柱子顶部', x: 30, y: 15 },
@@ -176,12 +179,14 @@ const AssemblyGame: React.FC<{
       <p className="text-sm font-bold text-foreground">🔧 把零件装到正确的位置！({placedCount}/{partsList.length})</p>
 
       {/* Assembly diagram */}
-      <div className={`relative w-full h-48 rounded-2xl bg-gradient-to-br ${level.bgClass} overflow-hidden border-2 border-border`}>
-        {/* Simple barrier outline */}
-        <div className="absolute left-[35%] bottom-[15%] w-8 h-20 bg-foreground/20 rounded-t-lg" />
-        <div className="absolute left-[43%] bottom-[55%] w-[45%] h-3 bg-foreground/15 rounded-full" />
+      <div className={`relative w-full h-64 rounded-2xl bg-gradient-to-br ${level.bgClass} overflow-hidden border-2 border-border`}>
+        <svg viewBox="0 0 280 160" className="absolute inset-0 w-full h-full opacity-40" aria-hidden>
+          <rect x="0" y="140" width="280" height="20" rx="4" fill="hsl(142,30%,70%)" />
+          <rect x="46" y="128" width="70" height="18" rx="4" fill="currentColor" />
+          <rect x="64" y="48" width="32" height="82" rx="5" fill="currentColor" />
+          <rect x="88" y="58" width="150" height="14" rx="7" fill="currentColor" />
+        </svg>
 
-        {/* Assembly slots */}
         {slots.map(slot => {
           const isPlaced = placed[slot.id];
           const isWrong = wrongSlot === slot.id;
@@ -190,14 +195,16 @@ const AssemblyGame: React.FC<{
             <button key={slot.id}
               onClick={() => handleDropOnSlot(slot.id)}
               disabled={isPlaced}
-              className={`absolute w-12 h-12 rounded-xl flex flex-col items-center justify-center transition-all text-xs font-bold ${
+              className={`absolute part-hotspot flex-col gap-0.5 px-1 transition-all text-[11px] font-extrabold ${
                 isPlaced ? 'bg-accent/40 scale-110 animate-pop-in' :
-                isWrong ? 'bg-destructive/30 ring-2 ring-destructive animate-shake' :
-                selectedPart ? 'bg-card/80 hover:bg-primary/20 ring-2 ring-dashed ring-primary/40 cursor-pointer' :
-                'bg-card/60 border border-dashed border-muted-foreground/30'
+                isWrong ? 'bg-destructive/30 ring-2 ring-destructive' :
+                selectedPart ? 'bg-card/90 hover:bg-primary/20 ring-2 ring-dashed ring-primary/50 cursor-pointer' :
+                'bg-card/80 border-2 border-dashed border-muted-foreground/40'
               }`}
               style={{ left: `${slot.x}%`, top: `${slot.y}%`, transform: 'translate(-50%, -50%)' }}>
-              {isPlaced ? <span className="text-lg">{part?.emoji}</span> : <span className="text-muted-foreground">{slot.label}</span>}
+              {isPlaced && part
+                ? <PartIcon id={part.icon} size={40} />
+                : <span className="text-muted-foreground text-center leading-tight px-1">{slot.label}</span>}
             </button>
           );
         })}
@@ -206,16 +213,14 @@ const AssemblyGame: React.FC<{
       {/* Parts tray */}
       <div className="flex gap-3 flex-wrap justify-center">
         {partsList.map(part => (
-          <button key={part.id}
+          <PartTile
+            key={part.id}
+            id={part.icon}
+            name={part.name}
+            placed={placed[part.id]}
+            selected={selectedPart === part.id}
             onClick={() => handleSelectPart(part.id)}
-            disabled={placed[part.id]}
-            className={`px-4 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 ${
-              placed[part.id] ? 'bg-accent/20 text-muted-foreground line-through' :
-              selectedPart === part.id ? 'bg-primary/20 ring-2 ring-primary scale-105' :
-              'bg-card border border-border hover:border-primary/30'
-            }`}>
-            {part.emoji} {part.name}
-          </button>
+          />
         ))}
       </div>
 
@@ -269,7 +274,7 @@ const TreasureScene: React.FC<{ level: TreasureLevel; onComplete: () => void }> 
     <div className="flex flex-col items-center gap-3">
       <p className="text-sm font-bold text-foreground">{level.sceneEmoji} {level.scene} — 找到 {found}/{total} 个零件</p>
 
-      <div className={`relative w-full h-64 rounded-3xl overflow-hidden border-2 border-border`}>
+      <div className={`relative w-full h-80 rounded-3xl overflow-hidden border-2 border-border`}>
         {/* SVG Scene Background */}
         {(() => {
           const SceneComp = SCENE_COMPONENTS[level.id];
@@ -280,26 +285,26 @@ const TreasureScene: React.FC<{ level: TreasureLevel; onComplete: () => void }> 
           <button key={part.id}
             onClick={() => handleFind(part.id)}
             disabled={part.found}
-            className={`absolute w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+            className={`absolute part-hotspot rounded-2xl transition-all shadow-md ${
               part.found
-                ? 'bg-accent/40 scale-110 animate-pop-in'
-                : 'bg-card/30 hover:bg-card/60 active:scale-125 animate-float'
+                ? 'bg-accent/50 scale-110 animate-pop-in'
+                : 'bg-card/85 hover:bg-card active:scale-110 animate-float ring-2 ring-primary/30'
             }`}
             style={{
               left: `${part.x}%`, top: `${part.y}%`, transform: 'translate(-50%, -50%)',
               animationDelay: `${Math.random() * 2}s`,
             }}>
-            <span className={`text-lg ${part.found ? '' : 'opacity-40 hover:opacity-100'}`}>{part.emoji}</span>
+            <PartIcon id={part.icon} size={44} className={part.found ? '' : 'opacity-90'} />
           </button>
         ))}
       </div>
 
       <div className="flex gap-2 flex-wrap justify-center">
         {parts.map(part => (
-          <div key={part.id} className={`px-3 py-1 rounded-xl text-sm font-bold ${
-            part.found ? 'bg-accent/20 text-foreground' : 'bg-muted text-muted-foreground/40'
+          <div key={part.id} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold ${
+            part.found ? 'bg-accent/20 text-foreground' : 'bg-muted text-muted-foreground'
           }`}>
-            {part.found ? part.emoji : '❓'} {part.name}
+            {part.found ? <PartIcon id={part.icon} size={28} /> : <span>❓</span>} {part.name}
           </div>
         ))}
       </div>

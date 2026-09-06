@@ -7,33 +7,33 @@ export const AnatomyDiagram: React.FC = React.memo(() => (
     <rect x="0" y="155" width="220" height="25" rx="3" fill="hsl(142,25%,75%)" />
     {/* Base */}
     <rect x="50" y="130" width="50" height="25" rx="5" fill="hsl(220,15%,45%)" stroke="hsl(220,15%,30%)" strokeWidth="1.5" />
-    <text x="140" y="148" fontSize="7" fill="hsl(var(--muted-foreground))" fontWeight="bold">底座 Base</text>
+    <text x="140" y="150" fontSize="11" fill="hsl(var(--muted-foreground))" fontWeight="bold">底座</text>
     <line x1="100" y1="142" x2="138" y2="145" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" strokeDasharray="3,2" />
     {/* Pillar */}
     <rect x="62" y="55" width="26" height="78" rx="4" fill="hsl(220,15%,50%)" stroke="hsl(220,15%,35%)" strokeWidth="1.5" />
-    <text x="10" y="95" fontSize="7" fill="hsl(var(--muted-foreground))" fontWeight="bold">立柱 Pillar</text>
+    <text x="8" y="96" fontSize="11" fill="hsl(var(--muted-foreground))" fontWeight="bold">立柱</text>
     <line x1="40" y1="93" x2="62" y2="93" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" strokeDasharray="3,2" />
     {/* Motor housing */}
     <rect x="55" y="72" width="40" height="30" rx="6" fill="hsl(195,60%,55%)" stroke="hsl(195,60%,40%)" strokeWidth="1.5" />
     <circle cx="75" cy="87" r="8" fill="hsl(195,80%,60%)" opacity="0.6" />
-    <text x="140" y="92" fontSize="7" fill="hsl(var(--muted-foreground))" fontWeight="bold">电机 Motor</text>
+    <text x="138" y="93" fontSize="11" fill="hsl(var(--muted-foreground))" fontWeight="bold">电机</text>
     <line x1="95" y1="87" x2="138" y2="90" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" strokeDasharray="3,2" />
     {/* Arm */}
     <rect x="88" y="58" width="100" height="10" rx="5" fill="hsl(0,65%,55%)" stroke="hsl(0,65%,40%)" strokeWidth="1.5" />
     {[100, 118, 136, 154, 172].map(x => <rect key={x} x={x} y="58" width="5" height="10" rx="1" fill="white" opacity="0.4" />)}
     <circle cx="185" cy="63" r="6" fill="hsl(48,90%,55%)" stroke="hsl(48,90%,40%)" strokeWidth="1" />
-    <text x="160" y="50" fontSize="7" fill="hsl(var(--muted-foreground))" fontWeight="bold">杆臂 Arm</text>
+    <text x="158" y="48" fontSize="11" fill="hsl(var(--muted-foreground))" fontWeight="bold">杆臂</text>
     <line x1="160" y1="52" x2="155" y2="58" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" strokeDasharray="3,2" />
     {/* Motor pivot */}
     <circle cx="88" cy="63" r="6" fill="hsl(220,20%,40%)" stroke="hsl(220,20%,30%)" strokeWidth="1.5" />
     {/* Sensor */}
     <circle cx="65" cy="115" r="5" fill="hsl(270,50%,55%)" stroke="hsl(270,50%,40%)" strokeWidth="1" />
-    <text x="10" y="118" fontSize="7" fill="hsl(var(--muted-foreground))" fontWeight="bold">传感器</text>
+    <text x="6" y="120" fontSize="11" fill="hsl(var(--muted-foreground))" fontWeight="bold">传感器</text>
     <line x1="38" y1="116" x2="60" y2="115" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" strokeDasharray="3,2" />
     {/* Signal light */}
     <circle cx="75" cy="50" r="6" fill="hsl(142,60%,50%)" stroke="hsl(142,60%,35%)" strokeWidth="1" />
     <circle cx="75" cy="50" r="3" fill="white" opacity="0.5" />
-    <text x="110" y="35" fontSize="7" fill="hsl(var(--muted-foreground))" fontWeight="bold">信号灯 Light</text>
+    <text x="108" y="34" fontSize="11" fill="hsl(var(--muted-foreground))" fontWeight="bold">信号灯</text>
     <line x1="110" y1="37" x2="81" y2="48" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" strokeDasharray="3,2" />
   </svg>
 ));

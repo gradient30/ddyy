@@ -10,7 +10,7 @@ const CountryBarrierSVG: React.FC<Props> = React.memo(({ countryId, isLifted }) 
   const armStyle = { transformOrigin: '30px 62px', transition: 'transform 0.8s cubic-bezier(0.34,1.56,0.64,1)', transform: armTransform };
 
   return (
-    <svg viewBox="0 0 120 100" className="w-32 h-24 mx-auto">
+    <svg viewBox="0 0 120 100" className="w-full max-w-[280px] h-auto mx-auto">
       {/* Ground */}
       <rect x="0" y="92" width="120" height="8" rx="2" fill="hsl(142,30%,70%)" />
 

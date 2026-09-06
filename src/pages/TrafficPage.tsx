@@ -124,16 +124,17 @@ const Level1Parking: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-foreground/10 rounded-b-3xl" />
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-foreground/20 rounded-b-3xl" />
       <div className="absolute bottom-8 left-0 right-0 h-1 border-t-2 border-dashed border-secondary" />
-      <div className="absolute bottom-2 right-[15%] w-16 h-16 border-2 border-dashed border-primary rounded-xl flex items-center justify-center">
-        <span className="text-xs font-bold text-primary">🅿️</span>
+      <div className="absolute bottom-2 right-[12%] w-24 h-20 border-4 border-dashed border-primary rounded-xl flex items-center justify-center bg-primary/10">
+        <span className="text-2xl font-bold text-primary">🅿️</span>
       </div>
-      <div className="absolute bottom-16 right-[35%]">
-        <div className="w-3 h-12 bg-foreground/40 rounded-t" />
-        <div className={`absolute top-0 left-3 w-14 h-2 bg-coral rounded origin-left transition-transform duration-700 ${barrierUp ? '-rotate-[85deg]' : 'rotate-0'}`}>
-          <div className="absolute right-0 top-0 w-2 h-2 rounded-full bg-secondary" />
+      <div className="absolute bottom-14 right-[38%]">
+        <div className="w-6 h-20 bg-foreground/50 rounded-t-lg" />
+        <div className={`absolute top-1 left-5 w-28 h-5 rounded-full origin-left transition-transform duration-700 overflow-hidden ${barrierUp ? '-rotate-[85deg]' : 'rotate-0'}`}
+          style={{ background: 'repeating-linear-gradient(90deg, #E25B4C 0 14px, #FFF8EE 14px 28px)' }}>
+          <div className="absolute right-0 top-0.5 w-4 h-4 rounded-full bg-secondary" />
         </div>
       </div>
-      <div className="absolute bottom-4 transition-all duration-150 text-4xl select-none cursor-grab active:cursor-grabbing"
+      <div className="absolute bottom-3 transition-all duration-150 text-6xl select-none cursor-grab active:cursor-grabbing"
         style={{ left: `${carX}%`, transform: 'translateX(-50%)' }}>
         🚙
       </div>
@@ -189,9 +190,9 @@ const Level2TrafficLight: React.FC<{ onComplete: () => void }> = ({ onComplete }
     <div className="flex flex-col items-center gap-4 relative">
       <IntersectionScene />
       <div className="bg-foreground/80 rounded-2xl p-3 flex flex-col gap-2 items-center w-16">
-        <div className={`w-10 h-10 rounded-full ${lightColor === 'red' ? lightColors.red : 'bg-foreground/30'}`} />
-        <div className={`w-10 h-10 rounded-full ${lightColor === 'yellow' ? lightColors.yellow : 'bg-foreground/30'}`} />
-        <div className={`w-10 h-10 rounded-full ${lightColor === 'green' ? lightColors.green : 'bg-foreground/30'}`} />
+        <div className={`w-16 h-16 rounded-full border-4 border-card ${lightColor === 'red' ? lightColors.red : 'bg-foreground/30'}`} />
+        <div className={`w-16 h-16 rounded-full border-4 border-card ${lightColor === 'yellow' ? lightColors.yellow : 'bg-foreground/30'}`} />
+        <div className={`w-16 h-16 rounded-full border-4 border-card ${lightColor === 'green' ? lightColors.green : 'bg-foreground/30'}`} />
       </div>
       <div className="flex gap-3">
         {[
@@ -241,7 +242,7 @@ const Level3CountCars: React.FC<{ onComplete: () => void }> = ({ onComplete }) =
       <p className="text-lg font-bold text-foreground">数一数，有几辆车？🚗</p>
       <div className="flex flex-wrap gap-2 justify-center max-w-xs">
         {Array.from({ length: targetCount }).map((_, i) => (
-          <span key={i} className="text-3xl animate-pop-in" style={{ animationDelay: `${i * 0.1}s` }}>
+          <span key={i} className="text-5xl animate-pop-in" style={{ animationDelay: `${i * 0.1}s` }}>
             {cars[i % cars.length]}
           </span>
         ))}
@@ -374,19 +375,19 @@ const Level5Driving: React.FC<{ onComplete: () => void }> = ({ onComplete }) => 
   return (
     <div className="flex flex-col items-center gap-3">
       <p className="font-bold text-foreground">躲避障碍！得分: {score}/10</p>
-      <div className="relative w-48 h-64 rounded-2xl overflow-hidden">
+      <div className="relative w-64 h-80 rounded-2xl overflow-hidden">
         <DrivingRoadScene />
         {[1, 2].map(i => (
           <div key={i} className="absolute top-0 bottom-0 w-px border-l border-dashed border-muted-foreground/30"
             style={{ left: `${(i * 100) / 3}%` }} />
         ))}
         {obstacles.map(o => (
-          <div key={o.id} className="absolute text-2xl transition-none"
+          <div key={o.id} className="absolute text-4xl transition-none"
             style={{ left: `${(o.lane * 100) / 3 + 16.6}%`, top: `${o.top}%`, transform: 'translate(-50%, -50%)' }}>
             🚧
           </div>
         ))}
-        <div className="absolute bottom-4 text-3xl transition-all duration-150"
+        <div className="absolute bottom-4 text-5xl transition-all duration-150"
           style={{ left: `${(carLane * 100) / 3 + 16.6}%`, transform: 'translateX(-50%)' }}>
           🚙
         </div>

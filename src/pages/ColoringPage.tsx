@@ -413,12 +413,12 @@ const ColoringPage: React.FC = () => {
 
         {/* 模板选择 */}
         {!selectedTemplate && (
-          <div className="max-w-md mx-auto grid grid-cols-5 gap-3 animate-pop-in">
+          <div className="max-w-md mx-auto grid grid-cols-2 sm:grid-cols-3 gap-3 animate-pop-in">
             {templates.map(t => (
               <button key={t.id} onClick={() => { playClick(); setSelectedTemplate(t.id); }}
-                className="touch-target rounded-2xl bg-card shadow-md p-3 flex flex-col items-center gap-1 hover:scale-110 active:scale-95 transition-all">
-                <span className="text-3xl">{t.emoji}</span>
-                <span className="text-[10px] font-bold text-foreground">{t.name}</span>
+                className="part-tile hover:scale-[1.03] active:scale-95">
+                <span className="text-5xl">{t.emoji}</span>
+                <span className="text-sm font-extrabold text-foreground">{t.name}</span>
               </button>
             ))}
           </div>
@@ -454,7 +454,7 @@ const ColoringPage: React.FC = () => {
                 <div className="flex gap-2 justify-center flex-wrap">
                   {colors.map(c => (
                     <button key={c.hex} onClick={() => setCurrentColor(c.hex)}
-                      className={`w-9 h-9 rounded-full border-2 transition-all hover:scale-125 ${currentColor === c.hex ? 'ring-3 ring-foreground scale-110' : 'ring-1 ring-border'}`}
+                      className={`w-14 h-14 rounded-full border-2 transition-all hover:scale-110 ${currentColor === c.hex ? 'ring-4 ring-foreground scale-110' : 'ring-1 ring-border'}`}
                       style={{ backgroundColor: c.hex }} aria-label={c.name} />
                   ))}
                 </div>
@@ -477,7 +477,7 @@ const ColoringPage: React.FC = () => {
                 <div className="flex gap-2 justify-center flex-wrap">
                   {stickers.map(s => (
                     <button key={s} onClick={() => setSelectedSticker(s)}
-                      className={`text-2xl rounded-lg p-1 transition-all ${selectedSticker === s ? 'bg-golden/30 ring-2 ring-golden scale-110' : ''}`}>
+                      className={`text-4xl rounded-xl p-2 min-w-[56px] min-h-[56px] transition-all ${selectedSticker === s ? 'bg-golden/30 ring-2 ring-golden scale-110' : 'bg-muted/40'}`}>
                       {s}
                     </button>
                   ))}

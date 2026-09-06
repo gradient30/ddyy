@@ -21,11 +21,15 @@ function CarRow({ count }: { count: number }) {
   return (
     <div className="flex flex-wrap justify-center gap-2 py-2">
       {Array.from({ length: count }).map((_, i) => (
-        <svg key={i} width="44" height="28" viewBox="0 0 44 28" aria-hidden>
-          <rect x="4" y="10" width="36" height="12" rx="4" fill="hsl(var(--sky-blue))" />
-          <rect x="12" y="4" width="16" height="10" rx="3" fill="hsl(var(--primary))" />
-          <circle cx="12" cy="22" r="4" fill="hsl(var(--foreground))" />
-          <circle cx="32" cy="22" r="4" fill="hsl(var(--foreground))" />
+        <svg key={i} width="72" height="46" viewBox="0 0 72 46" aria-hidden>
+          <rect x="6" y="16" width="60" height="18" rx="7" fill="hsl(var(--sky-blue))" />
+          <rect x="18" y="6" width="28" height="16" rx="5" fill="hsl(var(--primary))" />
+          <rect x="22" y="10" width="10" height="8" rx="2" fill="#E8F6FB" />
+          <rect x="36" y="10" width="8" height="8" rx="2" fill="#E8F6FB" />
+          <circle cx="20" cy="36" r="7" fill="hsl(var(--foreground))" />
+          <circle cx="52" cy="36" r="7" fill="hsl(var(--foreground))" />
+          <circle cx="20" cy="36" r="3" fill="#D8DEE4" />
+          <circle cx="52" cy="36" r="3" fill="#D8DEE4" />
         </svg>
       ))}
     </div>
@@ -209,9 +213,9 @@ const PatternPlay: React.FC<{ options: number; onCorrect: () => void; onWrong: (
       <p className="font-extrabold text-foreground mb-3">红绿红绿，下一个是？</p>
       <div className="flex justify-center gap-2 mb-5">
         {seq.map((i, idx) => (
-          <span key={idx} className="w-10 h-10 rounded-full border-2 border-card" style={{ background: colors[i].fill }} />
+          <span key={idx} className="w-14 h-14 rounded-full border-2 border-card" style={{ background: colors[i].fill }} />
         ))}
-        <span className="w-10 h-10 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center text-muted-foreground">?</span>
+        <span className="w-14 h-14 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center text-muted-foreground text-xl">?</span>
       </div>
       <div className="flex justify-center gap-3">
         {colors.map(c => (

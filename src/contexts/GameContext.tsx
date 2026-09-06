@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import type { AgeBand } from '@/data/age';
+import { getAgeConfig } from '@/data/age';
 import { setAudioFlags } from '@/lib/audio-flags';
+import { setSpeechDefaults } from '@/lib/speech';
 import {
   GameState,
   loadGameState,
@@ -59,6 +61,12 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const REST_DURATION = 10 * 60;
 
   const currentProfile = getCurrentProfile(state);
+
+  useEffect(() => {
+    const age = getAgeConfig(currentProfile?.ageBand);
+    const speed = currentProfile?.settings.voiceSpeed ?? age.speechRate;
+    setSpeechDefaults({ rate: Math.min(speed, 0.82) });
+  }, [currentProfile]);
 
   const selectProfile = useCallback((id: number) => {
     setState(prev => {

@@ -4,6 +4,7 @@ import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { useGame } from '@/contexts/GameContext';
 import { playClick, playSuccess, playError, playBarrierLift, vibrate } from '@/lib/sound';
 import { speak, speakBilingual, delay } from '@/lib/speech';
+import { PartIcon } from '@/components/parts/PartIcons';
 import { AnatomyDiagram, LeverDiagram, SolarMotorDiagram, SensorDiagram } from '@/components/scenes/LabScenes';
 
 // ===================== PREDICTION COMPONENT =====================
@@ -93,11 +94,11 @@ const Exp1Anatomy: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   }, []);
 
   const parts = [
-    { id: 'arm', label: '杆臂', labelEn: 'Arm (Lever)', x: 55, y: 15, desc: '杠杆手臂，用来挡住车辆', emoji: '💪' },
-    { id: 'motor', label: '电机', labelEn: 'Motor', x: 35, y: 55, desc: '轮轴心脏，让杆臂上下运动', emoji: '⚙️' },
-    { id: 'sensor', label: '传感器', labelEn: 'Sensor', x: 25, y: 75, desc: '小眼睛，感应有没有车', emoji: '👁️' },
-    { id: 'base', label: '底座', labelEn: 'Base', x: 40, y: 90, desc: '稳稳站住的大脚', emoji: '🧱' },
-    { id: 'light', label: '信号灯', labelEn: 'Signal Light', x: 60, y: 45, desc: '告诉大家可不可以走', emoji: '🚦' },
+    { id: 'arm', icon: 'arm1', label: '杆臂', labelEn: 'Arm (Lever)', x: 62, y: 12, desc: '长长的红白杆子，用来挡住车辆', emoji: '💪' },
+    { id: 'motor', icon: 'motor', label: '电机', labelEn: 'Motor', x: 32, y: 52, desc: '圆圆的发动机，让杆臂上下运动', emoji: '⚙️' },
+    { id: 'sensor', icon: 'sensor', label: '传感器', labelEn: 'Sensor', x: 18, y: 74, desc: '红色小眼睛，感应有没有车', emoji: '👁️' },
+    { id: 'base', icon: 'base', label: '底座', labelEn: 'Base', x: 38, y: 90, desc: '稳稳站住的大脚', emoji: '🧱' },
+    { id: 'light', icon: 'light', label: '信号灯', labelEn: 'Signal Light', x: 68, y: 42, desc: '红灯停、绿灯行', emoji: '🚦' },
   ];
 
   const handleClick = (part: typeof parts[0]) => {
@@ -122,22 +123,25 @@ const Exp1Anatomy: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-muted-foreground">点击道闸的每个部位 ({explored.size}/{parts.length})</p>
-      <div className="relative w-72 h-64">
+      <div className="relative w-full max-w-sm h-80">
         <AnatomyDiagram />
         {parts.map(part => (
           <button key={part.id} onClick={() => handleClick(part)}
-            className={`absolute w-10 h-10 rounded-full flex items-center justify-center transition-all text-lg ${
-              selected === part.id ? 'bg-primary/30 ring-2 ring-primary scale-125 animate-glow-pulse' :
-              explored.has(part.id) ? 'bg-accent/30' : 'bg-card/80 hover:bg-primary/20'
+            className={`absolute part-hotspot transition-all ${
+              selected === part.id ? 'bg-primary/30 ring-2 ring-primary scale-110 animate-glow-pulse' :
+              explored.has(part.id) ? 'bg-accent/30' : 'bg-card/90 hover:bg-primary/20 shadow-md'
             }`}
             style={{ left: `${part.x}%`, top: `${part.y}%`, transform: 'translate(-50%, -50%)' }}>
-            {part.emoji}
+            <PartIcon id={part.icon} size={40} />
           </button>
         ))}
       </div>
       {selected && (
         <div className="bg-primary/10 rounded-2xl p-3 text-center animate-pop-in max-w-xs">
-          <p className="font-bold text-foreground">{parts.find(p => p.id === selected)?.label} {parts.find(p => p.id === selected)?.emoji}</p>
+          <div className="flex justify-center mb-1">
+            <PartIcon id={parts.find(p => p.id === selected)?.icon ?? 'arm'} size={48} />
+          </div>
+          <p className="font-bold text-foreground">{parts.find(p => p.id === selected)?.label}</p>
           <p className="text-sm text-muted-foreground">{parts.find(p => p.id === selected)?.desc}</p>
           <p className="text-xs text-muted-foreground/60">{parts.find(p => p.id === selected)?.labelEn}</p>
         </div>
