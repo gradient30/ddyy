@@ -325,7 +325,7 @@ const Exp4Sensor: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
 // ===================== MAIN LAB PAGE =====================
 
 const LabPage: React.FC = () => {
-  const { addStars, addBadge } = useGame();
+  const { addStars, addBadge, addKnowledge, completeStation } = useGame();
   const [currentExp, setCurrentExp] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [showPrediction, setShowPrediction] = useState(true);
@@ -355,14 +355,18 @@ const LabPage: React.FC = () => {
       next.add(expId);
       addStars(2 + predictionBonus);
       if (next.size === 4) {
-        addBadge('小小科学家');
-        speak('恭喜！获得小小科学家徽章！');
+        addBadge('scientist');
+        addKnowledge('lever');
+        addKnowledge('solar');
+        addKnowledge('sensor');
+        completeStation('science');
+        speak('你已经会先猜再试啦');
       }
       return next;
     });
     setPredictionBonus(0);
     setTimeout(() => setCurrentExp(0), 2500);
-  }, [addStars, addBadge, predictionBonus]);
+  }, [addStars, addBadge, addKnowledge, completeStation, predictionBonus]);
 
   const renderExp = () => {
     switch (currentExp) {

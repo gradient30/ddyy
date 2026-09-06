@@ -1,230 +1,88 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '@/contexts/GameContext';
 import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
-import GlobalNav from '@/components/nav/GlobalNav';
-import { playSuccess, playClick } from '@/lib/sound';
-import { speak, delay, stopSpeaking } from '@/lib/speech';
-
-const greetingsZh = [
-  '小朋友你好呀！我是小闸闸！',
-  '嘿！今天又来玩啦！太开心了！',
-  '哇，小闸闸的好朋友来啦！',
-  '欢迎回来！我们一起探险吧！',
-  '你好呀！今天想玩什么？',
-];
-
-const greetingsEn = [
-  "Hi there! I'm XiaoZhaZha!",
-  "Hey! So happy to see you again!",
-  "Wow, my best friend is here!",
-  "Welcome back! Let's explore together!",
-  "Hello! What shall we play today?",
-];
-
-const funFacts = [
-  { zh: '你知道吗？道闸可以保护停车场的安全哦！', en: 'Barriers keep parking lots safe!', emoji: '🅿️' },
-  { zh: '全世界有好多不同样子的道闸呢！', en: 'There are many barrier types worldwide!', emoji: '🌍' },
-  { zh: '道闸的杆子就像一个大杠杆！', en: 'A barrier arm is like a big lever!', emoji: '⚖️' },
-  { zh: '有些道闸用太阳能发电，好环保！', en: 'Some barriers use solar power!', emoji: '☀️' },
-  { zh: '道闸上有传感器，能看到车来了！', en: 'Barriers have sensors to detect cars!', emoji: '👀' },
-  { zh: '最快的道闸可以1秒钟就抬起来！', en: 'The fastest barriers lift in 1 second!', emoji: '⚡' },
-];
+import GameLayout from '@/components/layout/GameLayout';
+import { playClick, playSuccess } from '@/lib/sound';
+import { delay, speak, stopSpeaking } from '@/lib/speech';
+import { getAgeConfig } from '@/data/age';
 
 const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentProfile, addStars } = useGame();
-  const [phase, setPhase] = useState<'tap-to-start' | 'intro' | 'greeting' | 'fact' | 'ready'>('tap-to-start');
-  const [greetIdx] = useState(() => Math.floor(Math.random() * greetingsZh.length));
-  const [factIdx] = useState(() => Math.floor(Math.random() * funFacts.length));
-  const [mascotMood, setMascotMood] = useState<'happy' | 'excited' | 'waving'>('waving');
-  const [showSubtitle, setShowSubtitle] = useState('');
-  const cancelledRef = React.useRef(false);
+  const { currentProfile, addStars, addBadge, addKnowledge, completeStation } = useGame();
+  const age = getAgeConfig(currentProfile?.ageBand);
+  const [phase, setPhase] = useState<'tap' | 'talk' | 'ready'>('tap');
+  const [line, setLine] = useState('');
+  const cancelled = React.useRef(false);
 
-  const runIntro = async () => {
-    cancelledRef.current = false;
+  useEffect(() => () => { cancelled.current = true; stopSpeaking(); }, []);
 
-    setPhase('intro');
-    await delay(400);
-    if (cancelledRef.current) return;
+  const run = async () => {
+    cancelled.current = false;
+    setPhase('talk');
+    const name = currentProfile?.name ?? '小朋友';
+    const lines = age.id === 'sprout'
+      ? [`${name}，你好呀！我是小闸闸。`, '今天我们一起看、一起点。', '走完一站，小路会打开下一站。']
+      : age.id === 'explorer'
+        ? [`${name}，欢迎回来！`, '道闸是停车场的大门，它会抬起来让车过去。', '我们先学会观察和数数，再学安全。']
+        : [`${name}，今天你是小小研究者。`, '每到一站，先想“为什么”，再动手。', '不同地方的大门不一样，但都是为了安全。'];
 
-    // Phase 1: Greeting
-    setPhase('greeting');
-    setMascotMood('waving');
-    setShowSubtitle(greetingsZh[greetIdx]);
-    await speak(greetingsZh[greetIdx], 'zh-CN', 0.85);
-    if (cancelledRef.current) return;
-
-    await delay(400);
-    if (cancelledRef.current) return;
-
-    setShowSubtitle(greetingsEn[greetIdx]);
-    await speak(greetingsEn[greetIdx], 'en-US', 0.8);
-    if (cancelledRef.current) return;
-
-    await delay(500);
-    if (cancelledRef.current) return;
-
-    // Phase 2: Fun fact
-    setPhase('fact');
-    setMascotMood('excited');
-    const fact = funFacts[factIdx];
-    setShowSubtitle(fact.zh);
-    await speak(fact.zh, 'zh-CN', 0.85);
-    if (cancelledRef.current) return;
-
-    await delay(400);
-    if (cancelledRef.current) return;
-
-    setShowSubtitle(fact.en);
-    await speak(fact.en, 'en-US', 0.8);
-    if (cancelledRef.current) return;
-
-    await delay(500);
-    if (cancelledRef.current) return;
-
-    // Phase 3: Ready
+    for (const text of lines) {
+      if (cancelled.current) return;
+      setLine(text);
+      await speak(text, 'zh-CN', age.speechRate);
+      await delay(350);
+    }
+    if (cancelled.current) return;
     setPhase('ready');
-    setMascotMood('happy');
-    setShowSubtitle('准备好了吗？出发探险啦！');
     playSuccess();
   };
 
-  // 用户点击后才开始语音引导（移动端必须在用户手势中触发语音）
-  const handleTapToStart = () => {
-    playClick();
-    // 在用户手势中同步触发一次静音语音，解锁移动端 TTS
-    if ('speechSynthesis' in window) {
-      const u = new SpeechSynthesisUtterance('');
-      u.volume = 0;
-      window.speechSynthesis.speak(u);
-    }
-    runIntro();
-  };
-
-  useEffect(() => {
-    return () => {
-      cancelledRef.current = true;
-      stopSpeaking();
-    };
-  }, []);
-
-  const handleExplore = () => {
+  const finish = () => {
     playClick();
     stopSpeaking();
     addStars(1);
+    addBadge('welcome-friend');
+    addKnowledge('greet-friend');
+    completeStation('welcome');
     navigate('/');
   };
 
-  const fact = funFacts[factIdx];
-
   return (
-    <>
-      <GlobalNav />
-      <div className="min-h-screen bg-gradient-to-b from-sky/20 via-background to-golden/10 pt-20 pb-8 px-4 flex flex-col items-center justify-center">
-        {/* 背景装饰 */}
-        <div className="absolute top-24 left-8 text-4xl animate-float opacity-60">🎈</div>
-        <div className="absolute top-32 right-8 text-3xl animate-float opacity-60" style={{ animationDelay: '1s' }}>🎪</div>
-        <div className="absolute bottom-20 left-12 text-3xl animate-bounce-gentle opacity-50">🌟</div>
-        <div className="absolute bottom-32 right-12 text-4xl animate-bounce-gentle opacity-50" style={{ animationDelay: '0.5s' }}>✨</div>
-
-        {/* 小闸闸 */}
-        <div className="animate-pop-in mb-6">
-          <XiaoZhaZha mood={mascotMood} size={140} />
-        </div>
-
-        {/* 对话气泡 */}
-        <div className="relative bg-card rounded-3xl shadow-lg p-6 max-w-md w-full text-center mb-6 animate-pop-in" style={{ animationDelay: '0.3s' }}>
-          {/* 三角箭头 */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-card rotate-45 rounded-sm" />
-
-          {phase === 'tap-to-start' && (
-            <div className="py-6">
-              <div className="text-5xl mb-3 animate-bounce-gentle">👋</div>
-              <p className="text-2xl font-black text-foreground mb-2">嗨！小朋友！</p>
-              <p className="text-base text-muted-foreground mb-4">点击下面按钮，小闸闸要跟你说话啦！</p>
-              <button
-                onClick={handleTapToStart}
-                className="touch-target rounded-3xl bg-gradient-to-r from-sky to-grass text-primary-foreground px-8 py-4 text-2xl font-black shadow-lg hover:scale-105 active:scale-95 transition-all animate-pulse"
-              >
-                🔊 点我开始！
-              </button>
-            </div>
-          )}
-
-          {phase === 'intro' && (
-            <div className="py-8">
-              <div className="text-4xl animate-bounce-gentle">🚧</div>
-              <p className="text-lg font-bold text-muted-foreground mt-2">加载中...</p>
-            </div>
-          )}
-
-          {phase === 'greeting' && (
-            <div className="py-4">
-              <p className="text-2xl md:text-3xl font-black text-foreground mb-2">{greetingsZh[greetIdx]}</p>
-              <p className="text-lg text-muted-foreground italic">{greetingsEn[greetIdx]}</p>
-              {currentProfile && (
-                <p className="text-xl mt-3 font-bold text-primary">
-                  {currentProfile.avatar} {currentProfile.name}，你好！
-                </p>
-              )}
-            </div>
-          )}
-
-          {phase === 'fact' && (
-            <div className="py-4">
-              <div className="text-5xl mb-3">{fact.emoji}</div>
-              <p className="text-xl font-bold text-foreground mb-1">{fact.zh}</p>
-              <p className="text-base text-muted-foreground italic">{fact.en}</p>
-            </div>
-          )}
-
-          {phase === 'ready' && (
-            <div className="py-4">
-              <p className="text-2xl font-black text-foreground mb-4">🎉 准备好了吗？</p>
-              <p className="text-lg text-muted-foreground mb-4">点击下面的按钮，开始今天的冒险！</p>
-              <button
-                onClick={handleExplore}
-                className="touch-target rounded-3xl bg-gradient-to-r from-sky to-grass text-primary-foreground px-8 py-4 text-2xl font-black shadow-lg hover:scale-105 active:scale-95 transition-all"
-              >
-                🗺️ 出发探险！
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* 字幕 */}
-        {showSubtitle && (
-          <div className="bg-foreground/80 text-primary-foreground rounded-2xl px-6 py-3 max-w-sm text-center animate-pop-in">
-            <p className="text-lg font-bold">🔊 {showSubtitle}</p>
+    <GameLayout
+      title="欢迎小屋"
+      domain="social"
+      goal={age.id === 'sprout' ? '听小闸闸打招呼，点一下出发' : age.id === 'explorer' ? '听问候，记住小闸闸' : '听完后能说出下一站去哪里'}
+      mascotMood="waving"
+      showBack
+    >
+      <div className="soft-card p-6 text-center">
+        <XiaoZhaZha mood={phase === 'ready' ? 'happy' : 'waving'} size={130} className="mx-auto" />
+        {phase === 'tap' && (
+          <div className="mt-4">
+            <p className="text-xl font-black mb-2">点一下，小闸闸开始说话</p>
+            <p className="text-sm text-muted-foreground mb-5">先听完，再走上成长小路</p>
+            <button onClick={() => { playClick(); run(); }} className="kid-btn px-8 bg-primary text-primary-foreground text-xl">
+              我听好了
+            </button>
           </div>
         )}
-
-        {/* 跳过按钮 */}
-        {phase !== 'ready' && (
-          <button
-            onClick={handleExplore}
-            className="mt-6 text-muted-foreground hover:text-foreground text-sm underline transition-colors"
-          >
-            跳过 →
-          </button>
+        {phase === 'talk' && (
+          <p className="mt-5 text-xl font-extrabold leading-snug">{line}</p>
         )}
-
-        {/* 再听一次 */}
-        {phase !== 'intro' && (
-          <button
-            onClick={() => {
-              playClick();
-              if (phase === 'greeting') speak(greetingsZh[greetIdx], 'zh-CN', 0.7);
-              else if (phase === 'fact') speak(fact.zh, 'zh-CN', 0.7);
-            }}
-            className="mt-4 touch-target rounded-2xl bg-golden/20 hover:bg-golden/30 px-6 py-3 text-lg font-bold transition-all active:scale-95"
-          >
-            🔁 再听一次（慢速）
-          </button>
+        {phase === 'ready' && (
+          <div className="mt-5">
+            <p className="text-xl font-black mb-4">下一站是观察花园</p>
+            <button onClick={finish} className="kid-btn px-8 bg-primary text-primary-foreground text-xl">
+              出发
+            </button>
+          </div>
+        )}
+        {phase !== 'ready' && (
+          <button onClick={finish} className="mt-5 text-sm text-muted-foreground underline">先去小路看看</button>
         )}
       </div>
-    </>
+    </GameLayout>
   );
 };
 

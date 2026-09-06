@@ -1,73 +1,24 @@
-# Welcome to your Lovable project
+# 道闸成长小路
 
-## Project info
+给 **4–7 岁** 的学前互动课：以道闸为主题，把观察、数感、语言、安全和科学排成一条成长小路。免费、无广告、进度存在本机。
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 怎么玩
 
-## How can I edit this code?
+1. 选小朋友，再选年龄：**萌芽 4–5 / 探索 5–6 / 建构 6–7**
+2. 从欢迎小屋出发，按序打开下一站
+3. 每站只学一件刚刚好的事；学会的本领收进成长手册
 
-There are several ways of editing your application.
+家长区密码默认 `1234`。可以关掉声音/语音，或开放全部站点。
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## 本地开发
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
+npm run test
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## 课程依据
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+对照《3–6 岁儿童学习与发展指南》五大领域，并补上 4–7 岁关键的数感分层。详见 `src/data/curriculum.ts`。

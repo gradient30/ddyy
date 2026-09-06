@@ -1,12 +1,12 @@
 {
-  "name": "道闸乐园 Barrier Buddies",
-  "short_name": "道闸乐园",
-  "description": "4-7岁儿童教育互动乐园",
+  "name": "道闸成长小路",
+  "short_name": "成长小路",
+  "description": "4–7岁观察、数感、语言与安全课",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f0f9ff",
-  "theme_color": "#00BFFF",
+  "background_color": "#F8F3EA",
+  "theme_color": "#5F8F7A",
   "icons": [
     { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" },
     { "src": "/favicon.ico", "sizes": "192x192", "type": "image/x-icon" },

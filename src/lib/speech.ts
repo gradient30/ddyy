@@ -1,5 +1,7 @@
 // 道闸乐园 - Web Speech API 语音合成（含移动端解锁）
 
+import { getAudioFlags } from '@/lib/audio-flags';
+
 let speechUnlocked = false;
 
 /** 在首次用户点击时解锁语音合成（移动端必须） */
@@ -31,7 +33,7 @@ export function delay(ms: number): Promise<void> {
 
 export function speak(text: string, lang: 'zh-CN' | 'en-US' = 'zh-CN', rate = 0.8): Promise<void> {
   return new Promise((resolve) => {
-    if (!('speechSynthesis' in window)) {
+    if (!getAudioFlags().voice || !('speechSynthesis' in window)) {
       resolve();
       return;
     }

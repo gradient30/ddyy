@@ -48,7 +48,7 @@ const ParentPage: React.FC = () => {
   // PIN entry screen
   if (!authed) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-muted via-background to-muted flex flex-col items-center justify-center p-6">
+      <div className="paper-page min-h-screen flex flex-col items-center justify-center p-6">
         <button onClick={() => { playClick(); navigate('/'); }} className="absolute top-4 left-4 text-3xl touch-target">🏠</button>
         <div className="text-6xl mb-4">🔑</div>
         <h1 className="text-2xl font-black text-foreground mb-2">家长区</h1>
@@ -88,7 +88,7 @@ const ParentPage: React.FC = () => {
   const { globalSettings } = state;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-muted via-background to-muted p-4">
+    <div className="paper-page min-h-screen p-4">
       <div className="flex items-center justify-between mb-6">
         <button onClick={() => { playClick(); navigate('/'); }} className="text-3xl touch-target">🏠</button>
         <h1 className="text-2xl font-black text-foreground">👨‍👩‍👧 家长区</h1>
@@ -120,11 +120,16 @@ const ParentPage: React.FC = () => {
                   <p className="text-xs text-muted-foreground">上次游玩: {new Date(p.lastPlayedAt).toLocaleDateString('zh-CN')}</p>
                 </div>
               </div>
+              <p className="text-xs text-muted-foreground mb-3">
+                年龄层：{p.ageBand === 'sprout' ? '萌芽 4–5岁' : p.ageBand === 'builder' ? '建构 6–7岁' : '探索 5–6岁'}
+                · 已走 {p.completedStations?.length ?? 0} 站
+                · 本领 {p.knowledgeIds?.length ?? 0}
+              </p>
               <div className="grid grid-cols-4 gap-2 text-center">
                 <MiniStat icon="⭐" value={p.stars} label="星星" />
                 <MiniStat icon="🏅" value={p.badges.length} label="徽章" />
                 <MiniStat icon="📖" value={p.learnedWords.length} label="词汇" />
-                <MiniStat icon="⏰" value={p.totalPlayMinutes} label="分钟" />
+                <MiniStat icon="📘" value={p.knowledgeIds?.length ?? 0} label="本领" />
               </div>
             </div>
           ))}
@@ -181,6 +186,11 @@ const ParentPage: React.FC = () => {
               label="⏰ 定时休息"
               value={globalSettings.timerEnabled}
               onChange={v => updateSettings({ timerEnabled: v })}
+            />
+            <SettingToggle
+              label="开放全部站点（跳过小路顺序）"
+              value={globalSettings.unlockAllStations}
+              onChange={v => updateSettings({ unlockAllStations: v })}
             />
           </div>
 
