@@ -4,7 +4,8 @@ import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { PartIcon } from '@/components/parts/PartIcons';
 import { PartTile } from '@/components/parts/PartTile';
 import { useGame } from '@/contexts/GameContext';
-import { playClick, playSuccess, playStarCollect, playError, vibrate } from '@/lib/sound';
+import { MechanicalBarrier } from '@/components/parts/MechanicalBarrier';
+import { playClick, playError, playPlacePart, playStarCollect, playSuccess, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
 import { ParkingTreasureScene, MallBasementScene, SchoolGateScene, ParkEntranceScene, HighwayTollScene } from '@/components/scenes/TreasureScenes';
 
@@ -149,8 +150,7 @@ const AssemblyGame: React.FC<{
     playClick();
 
     if (selectedPart === slotId) {
-      // Correct placement
-      playSuccess();
+      playPlacePart();
       vibrate(80);
       setPlaced(prev => ({ ...prev, [selectedPart]: true }));
       const part = partsList.find(p => p.id === selectedPart);
@@ -178,14 +178,11 @@ const AssemblyGame: React.FC<{
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm font-bold text-foreground">🔧 把零件装到正确的位置！({placedCount}/{partsList.length})</p>
 
-      {/* Assembly diagram */}
-      <div className={`relative w-full h-64 rounded-2xl bg-gradient-to-br ${level.bgClass} overflow-hidden border-2 border-border`}>
-        <svg viewBox="0 0 280 160" className="absolute inset-0 w-full h-full opacity-40" aria-hidden>
-          <rect x="0" y="140" width="280" height="20" rx="4" fill="hsl(142,30%,70%)" />
-          <rect x="46" y="128" width="70" height="18" rx="4" fill="currentColor" />
-          <rect x="64" y="48" width="32" height="82" rx="5" fill="currentColor" />
-          <rect x="88" y="58" width="150" height="14" rx="7" fill="currentColor" />
-        </svg>
+      <div className={`relative w-full min-h-[220px] h-[36dvh] rounded-2xl bg-gradient-to-br ${level.bgClass} overflow-hidden border-2 border-border`}>
+        <MechanicalBarrier
+          slots={{ base: 'base1', pillar: 'pillar1', motor: 'motor1', arm: 'arm1' }}
+          className="absolute inset-0 w-full h-full"
+        />
 
         {slots.map(slot => {
           const isPlaced = placed[slot.id];
@@ -274,7 +271,7 @@ const TreasureScene: React.FC<{ level: TreasureLevel; onComplete: () => void }> 
     <div className="flex flex-col items-center gap-3">
       <p className="text-sm font-bold text-foreground">{level.sceneEmoji} {level.scene} — 找到 {found}/{total} 个零件</p>
 
-      <div className={`relative w-full h-80 rounded-3xl overflow-hidden border-2 border-border`}>
+      <div className={`relative w-full min-h-[240px] h-[42dvh] rounded-3xl overflow-hidden border-2 border-border`}>
         {/* SVG Scene Background */}
         {(() => {
           const SceneComp = SCENE_COMPONENTS[level.id];
@@ -339,10 +336,10 @@ const TreasurePage: React.FC = () => {
   }, [addStars, addBadge, addKnowledge, completeStation, completed.size, maxLevels]);
 
   return (
-    <>
+    <div className="app-stage paper-page">
       <GlobalNav />
-      <div className="min-h-screen bg-gradient-to-b from-orange-warm/15 via-background to-golden/10 pt-20 pb-8 px-4">
-        <div className="max-w-md mx-auto">
+      <div className="app-stage-body px-3 md:px-5 pb-3">
+        <div className="h-full max-w-4xl mx-auto flex flex-col">
           {activeLevel === null ? (
             <>
               <div className="text-center mb-6">
@@ -374,7 +371,7 @@ const TreasurePage: React.FC = () => {
                 className="touch-target rounded-2xl bg-card hover:bg-muted px-4 py-2 font-bold text-foreground mb-4 active:scale-95 transition-all">
                 ← 返回关卡
               </button>
-              <div className="bg-card rounded-3xl shadow-lg p-5">
+              <div className="flex-1 min-h-0 bg-card rounded-3xl shadow-lg p-3 md:p-5 overflow-auto">
                 <TreasureScene
                   level={LEVELS.find(l => l.id === activeLevel)!}
                   onComplete={() => handleComplete(activeLevel)}
@@ -384,7 +381,7 @@ const TreasurePage: React.FC = () => {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

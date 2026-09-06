@@ -29,41 +29,31 @@ const GameLayout: React.FC<GameLayoutProps> = ({
   const age = getAgeConfig(currentProfile?.ageBand);
 
   return (
-    <>
+    <div className="app-stage paper-page">
       <GlobalNav />
-      <div className="paper-page min-h-screen pt-20 pb-10 px-4">
-        <div className="max-w-lg mx-auto">
-          <div className="flex items-start gap-3 mb-5">
-            {showBack && (
-              <button
-                onClick={() => { playClick(); navigate('/'); }}
-                className="kid-btn touch-target bg-card border border-border text-foreground px-3 shrink-0"
-                aria-label="回到成长小路"
-              >
-                ←
-              </button>
-            )}
-            <div className="flex-1">
-              <p className="text-xs font-bold tracking-wide text-primary mb-1">
-                {DOMAIN_LABEL[domain]} · {age.label}{age.years}
-              </p>
-              <h1 className="text-2xl md:text-3xl font-black text-foreground leading-tight">{title}</h1>
-            </div>
-            <XiaoZhaZha mood={mascotMood} size={64} />
+      <div className="app-stage-body px-3 md:px-5 pb-3 flex flex-col">
+        <header className="flex items-center gap-2 md:gap-3 shrink-0 mb-2">
+          {showBack && (
+            <button
+              onClick={() => { playClick(); navigate('/'); }}
+              className="kid-btn touch-target bg-card border border-border text-foreground px-3 shrink-0 h-12 min-h-12"
+              aria-label="回到成长小路"
+            >
+              ←
+            </button>
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-bold tracking-wide text-primary">
+              {DOMAIN_LABEL[domain]} · {age.label}{age.years}
+            </p>
+            <h1 className="text-xl md:text-2xl font-black text-foreground leading-tight truncate">{title}</h1>
+            <p className="text-sm font-extrabold text-foreground/80 leading-snug truncate">🎯 {goal}</p>
           </div>
-
-          <div className="soft-card px-4 py-3 mb-5 flex items-start gap-3">
-            <span className="text-xl" aria-hidden>🎯</span>
-            <div>
-              <p className="text-xs font-bold text-muted-foreground">今天学这个</p>
-              <p className="text-base font-extrabold text-foreground leading-snug">{goal}</p>
-            </div>
-          </div>
-
-          {children}
-        </div>
+          <XiaoZhaZha mood={mascotMood} size={52} />
+        </header>
+        <main className="flex-1 min-h-0 overflow-auto">{children}</main>
       </div>
-    </>
+    </div>
   );
 };
 

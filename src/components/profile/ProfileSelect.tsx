@@ -33,7 +33,7 @@ const ProfileSelect: React.FC = () => {
   };
 
   return (
-    <div className="paper-page min-h-screen flex flex-col items-center justify-center p-5">
+    <div className="app-stage paper-page flex flex-col items-center justify-center p-5">
       <XiaoZhaZha mood="waving" size={120} />
       <h1 className="text-3xl md:text-5xl font-black text-foreground mt-3">道闸成长小路</h1>
       <p className="text-muted-foreground mt-1 mb-8 text-center">给 4–7 岁的观察、数感、语言和安全课</p>
