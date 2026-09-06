@@ -4,7 +4,8 @@ import XiaoZhaZha from '@/components/mascot/XiaoZhaZha';
 import { PartIcon } from '@/components/parts/PartIcons';
 import { PartTile } from '@/components/parts/PartTile';
 import { useGame } from '@/contexts/GameContext';
-import { playClick, playSuccess, playStarCollect, playError, vibrate } from '@/lib/sound';
+import { MechanicalBarrier } from '@/components/parts/MechanicalBarrier';
+import { playClick, playError, playPlacePart, playStarCollect, playSuccess, vibrate } from '@/lib/sound';
 import { speak } from '@/lib/speech';
 import { ParkingTreasureScene, MallBasementScene, SchoolGateScene, ParkEntranceScene, HighwayTollScene } from '@/components/scenes/TreasureScenes';
 
@@ -46,9 +47,9 @@ const LEVELS: TreasureLevel[] = [
       { id: 'spring1', icon: 'spring', emoji: '🌀', name: '弹簧', x: 45, y: 80 },
     ],
     assemblySlots: [
-      { id: 'bolt1', label: '固定底座', x: 20, y: 80 },
-      { id: 'gear1', label: '电机里面', x: 50, y: 50 },
-      { id: 'spring1', label: '杆臂连接', x: 80, y: 30 },
+      { id: 'bolt1', label: '固定底座', x: 22, y: 82 },
+      { id: 'gear1', label: '电机里面', x: 28, y: 44 },
+      { id: 'spring1', label: '杆臂连接', x: 38, y: 44 },
     ],
   },
   {
@@ -60,9 +61,9 @@ const LEVELS: TreasureLevel[] = [
       { id: 'led1', icon: 'led', emoji: '💡', name: 'LED灯', x: 55, y: 40 },
     ],
     assemblySlots: [
-      { id: 'motor1', label: '连接电机', x: 30, y: 60 },
-      { id: 'panel1', label: '底座内部', x: 50, y: 80 },
-      { id: 'led1', label: '杆臂顶端', x: 75, y: 25 },
+      { id: 'motor1', label: '连接电机', x: 28, y: 44 },
+      { id: 'panel1', label: '底座内部', x: 32, y: 62 },
+      { id: 'led1', label: '杆臂顶端', x: 78, y: 44 },
     ],
   },
   {
@@ -74,9 +75,9 @@ const LEVELS: TreasureLevel[] = [
       { id: 'battery1', icon: 'battery', emoji: '🔋', name: '电池', x: 10, y: 55 },
     ],
     assemblySlots: [
-      { id: 'arm1', label: '电机上方', x: 65, y: 25 },
-      { id: 'sensor1', label: '底座前方', x: 25, y: 75 },
-      { id: 'battery1', label: '底座内部', x: 45, y: 65 },
+      { id: 'arm1', label: '电机上方', x: 45, y: 44 },
+      { id: 'sensor1', label: '底座前方', x: 18, y: 54 },
+      { id: 'battery1', label: '底座内部', x: 22, y: 72 },
     ],
   },
   {
@@ -88,9 +89,9 @@ const LEVELS: TreasureLevel[] = [
       { id: 'paint1', icon: 'bucket', emoji: '🎨', name: '油漆桶', x: 60, y: 85 },
     ],
     assemblySlots: [
-      { id: 'solar1', label: '顶部', x: 50, y: 15 },
-      { id: 'hinge1', label: '杆臂连接处', x: 55, y: 45 },
-      { id: 'paint1', label: '外壳涂装', x: 35, y: 70 },
+      { id: 'solar1', label: '顶部', x: 22, y: 18 },
+      { id: 'hinge1', label: '杆臂连接处', x: 38, y: 44 },
+      { id: 'paint1', label: '外壳涂装', x: 22, y: 50 },
     ],
   },
   {
@@ -103,10 +104,10 @@ const LEVELS: TreasureLevel[] = [
       { id: 'wire1', icon: 'cable', emoji: '🧵', name: '线缆', x: 80, y: 80 },
     ],
     assemblySlots: [
-      { id: 'cam1', label: '柱子顶部', x: 30, y: 15 },
-      { id: 'chip1', label: '控制板上', x: 50, y: 60 },
-      { id: 'sign1', label: '杆臂中间', x: 70, y: 30 },
-      { id: 'wire1', label: '连接各处', x: 40, y: 80 },
+      { id: 'cam1', label: '柱子顶部', x: 22, y: 22 },
+      { id: 'chip1', label: '控制板上', x: 32, y: 62 },
+      { id: 'sign1', label: '杆臂中间', x: 58, y: 44 },
+      { id: 'wire1', label: '连接各处', x: 22, y: 72 },
     ],
   },
 ];
@@ -149,8 +150,7 @@ const AssemblyGame: React.FC<{
     playClick();
 
     if (selectedPart === slotId) {
-      // Correct placement
-      playSuccess();
+      playPlacePart();
       vibrate(80);
       setPlaced(prev => ({ ...prev, [selectedPart]: true }));
       const part = partsList.find(p => p.id === selectedPart);
@@ -175,17 +175,14 @@ const AssemblyGame: React.FC<{
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-3 h-full min-h-0">
       <p className="text-sm font-bold text-foreground">🔧 把零件装到正确的位置！({placedCount}/{partsList.length})</p>
 
-      {/* Assembly diagram */}
-      <div className={`relative w-full h-64 rounded-2xl bg-gradient-to-br ${level.bgClass} overflow-hidden border-2 border-border`}>
-        <svg viewBox="0 0 280 160" className="absolute inset-0 w-full h-full opacity-40" aria-hidden>
-          <rect x="0" y="140" width="280" height="20" rx="4" fill="hsl(142,30%,70%)" />
-          <rect x="46" y="128" width="70" height="18" rx="4" fill="currentColor" />
-          <rect x="64" y="48" width="32" height="82" rx="5" fill="currentColor" />
-          <rect x="88" y="58" width="150" height="14" rx="7" fill="currentColor" />
-        </svg>
+      <div className={`relative w-full min-h-[280px] flex-1 h-[52dvh] rounded-2xl bg-[#5C646C] overflow-hidden border-2 border-border`}>
+        <MechanicalBarrier
+          slots={{ base: 'base1', pillar: 'pillar1', motor: 'motor1', arm: 'arm1' }}
+          className="absolute inset-0 w-full h-full"
+        />
 
         {slots.map(slot => {
           const isPlaced = placed[slot.id];
@@ -271,10 +268,10 @@ const TreasureScene: React.FC<{ level: TreasureLevel; onComplete: () => void }> 
   }
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-3 h-full min-h-0">
       <p className="text-sm font-bold text-foreground">{level.sceneEmoji} {level.scene} — 找到 {found}/{total} 个零件</p>
 
-      <div className={`relative w-full h-80 rounded-3xl overflow-hidden border-2 border-border`}>
+      <div className={`relative w-full min-h-[280px] flex-1 h-[56dvh] rounded-3xl overflow-hidden border-2 border-border`}>
         {/* SVG Scene Background */}
         {(() => {
           const SceneComp = SCENE_COMPONENTS[level.id];
@@ -339,10 +336,10 @@ const TreasurePage: React.FC = () => {
   }, [addStars, addBadge, addKnowledge, completeStation, completed.size, maxLevels]);
 
   return (
-    <>
+    <div className="app-stage paper-page">
       <GlobalNav />
-      <div className="min-h-screen bg-gradient-to-b from-orange-warm/15 via-background to-golden/10 pt-20 pb-8 px-4">
-        <div className="max-w-md mx-auto">
+      <div className="app-stage-body px-3 md:px-5 pb-3">
+        <div className="h-full w-full flex flex-col">
           {activeLevel === null ? (
             <>
               <div className="text-center mb-6">
@@ -374,7 +371,7 @@ const TreasurePage: React.FC = () => {
                 className="touch-target rounded-2xl bg-card hover:bg-muted px-4 py-2 font-bold text-foreground mb-4 active:scale-95 transition-all">
                 ← 返回关卡
               </button>
-              <div className="bg-card rounded-3xl shadow-lg p-5">
+              <div className="flex-1 min-h-0 bg-card rounded-3xl shadow-lg p-3 md:p-5 overflow-auto">
                 <TreasureScene
                   level={LEVELS.find(l => l.id === activeLevel)!}
                   onComplete={() => handleComplete(activeLevel)}
@@ -384,7 +381,7 @@ const TreasurePage: React.FC = () => {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

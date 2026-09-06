@@ -48,7 +48,7 @@ const ParentPage: React.FC = () => {
   // PIN entry screen
   if (!authed) {
     return (
-      <div className="paper-page min-h-screen flex flex-col items-center justify-center p-6">
+      <div className="app-stage paper-page flex flex-col items-center justify-center p-6">
         <button onClick={() => { playClick(); navigate('/'); }} className="absolute top-4 left-4 text-3xl touch-target">🏠</button>
         <div className="text-6xl mb-4">🔑</div>
         <h1 className="text-2xl font-black text-foreground mb-2">家长区</h1>
@@ -88,7 +88,7 @@ const ParentPage: React.FC = () => {
   const { globalSettings } = state;
 
   return (
-    <div className="paper-page min-h-screen p-4">
+    <div className="app-stage paper-page p-4 pt-6 overflow-auto">
       <div className="flex items-center justify-between mb-6">
         <button onClick={() => { playClick(); navigate('/'); }} className="text-3xl touch-target">🏠</button>
         <h1 className="text-2xl font-black text-foreground">👨‍👩‍👧 家长区</h1>

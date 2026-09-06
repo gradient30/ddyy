@@ -27,39 +27,40 @@ const IslandMap: React.FC = () => {
   };
 
   return (
-    <div className="paper-page min-h-screen pt-16 pb-10 px-4">
-      <div className="max-w-lg mx-auto">
-        <header className="text-center mb-6 pt-2">
-          <p className="text-sm font-bold text-primary">{age.label} · {age.years}</p>
-          <h1 className="text-3xl md:text-4xl font-black text-foreground mt-1">道闸成长小路</h1>
-          <p className="text-muted-foreground mt-1">{age.tagline}</p>
+    <div className="app-stage paper-page">
+      <div className="app-stage-body px-3 md:px-8 pb-3 flex flex-col w-full">
+        <header className="flex items-center justify-between gap-3 shrink-0 mb-2">
+          <div>
+            <p className="text-xs font-bold text-primary">{age.label} · {age.years}</p>
+            <h1 className="text-2xl md:text-3xl font-black text-foreground">道闸成长小路</h1>
+          </div>
+          <p className="text-sm text-muted-foreground hidden sm:block">{age.tagline}</p>
         </header>
 
         <button
           onClick={() => handleOpen(next.path, true)}
-          className="soft-card w-full p-4 mb-6 flex items-center gap-3 text-left hover:scale-[1.01] active:scale-[0.99] transition-transform"
+          className="soft-card w-full p-3 md:p-4 mb-3 flex items-center gap-3 text-left hover:scale-[1.01] active:scale-[0.99] transition-transform shrink-0"
         >
-          <XiaoZhaZha mood="waving" size={72} />
-          <div className="flex-1">
+          <XiaoZhaZha mood="waving" size={64} />
+          <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-primary">小闸闸邀请你</p>
             <p className="text-lg font-black text-foreground">下一站：{next.name}</p>
             <p className="text-sm text-muted-foreground leading-snug">{next.goal[age.id]}</p>
           </div>
         </button>
 
-        <div className="flex items-center justify-between text-sm font-bold text-muted-foreground mb-3 px-1">
+        <div className="flex items-center justify-between text-sm font-bold text-muted-foreground mb-2 px-1 shrink-0">
           <span>成长进度</span>
           <span>{doneCount} / {STATIONS.length}</span>
         </div>
-        <div className="h-3 rounded-full bg-muted overflow-hidden mb-6">
+        <div className="h-2 rounded-full bg-muted overflow-hidden mb-3 shrink-0">
           <div
             className="h-full rounded-full bg-gradient-to-r from-primary to-golden transition-all"
             style={{ width: `${(doneCount / STATIONS.length) * 100}%` }}
           />
         </div>
 
-        <ol className="relative space-y-4">
-          <div className="absolute left-[27px] top-6 bottom-6 w-1 rounded-full bg-border/80" aria-hidden />
+        <ol className="relative flex-1 min-h-0 overflow-auto grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-3 pr-1 content-start">
           {STATIONS.map((station, index) => {
             const unlocked = isStationUnlocked(station.id, completed, unlockAll);
             const done = completed.includes(station.id);
@@ -68,7 +69,7 @@ const IslandMap: React.FC = () => {
                 <button
                   disabled={!unlocked}
                   onClick={() => handleOpen(station.path, unlocked)}
-                  className={`relative w-full text-left soft-card p-4 pl-16 bg-gradient-to-br ${station.tint} transition-all ${
+                  className={`relative w-full text-left soft-card p-3 md:p-4 pl-16 bg-gradient-to-br ${station.tint} transition-all ${
                     unlocked ? 'hover:scale-[1.01] active:scale-[0.99]' : 'opacity-55'
                   } ${done ? 'ring-2 ring-primary/30' : ''}`}
                   aria-label={`${station.name}${unlocked ? '' : '，还没开放'}`}
@@ -95,7 +96,7 @@ const IslandMap: React.FC = () => {
           })}
         </ol>
 
-        <div className="flex justify-center gap-3 mt-8">
+        <div className="flex justify-center gap-3 mt-3 shrink-0">
           <button
             onClick={() => { playClick(); navigate('/collection'); }}
             className="kid-btn touch-target px-5 bg-golden/25 text-foreground"
