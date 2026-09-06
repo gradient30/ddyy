@@ -45,7 +45,7 @@ const MathPage: React.FC = () => {
     { id: 'compare', name: '比多少', desc: '哪一边的车更多？', show: true },
     { id: 'shape', name: '认形状', desc: '道闸上藏着什么形状？', show: true },
     { id: 'pattern', name: '找规律', desc: '红灯绿灯，下一个是谁？', show: age.id !== 'sprout' },
-    { id: 'add', name: '来了与走了', desc: '又来一辆，还剩几辆？', show: age.allowAddSubtract },
+    { id: 'add', name: '来了与走了', desc: '又来了几辆，或开走了几辆？', show: age.allowAddSubtract },
   ];
 
   const finishActivity = (knowledgeId: string) => {
@@ -132,7 +132,7 @@ const CountPlay: React.FC<{ max: number; options: number; onCorrect: () => void;
       </div>
       <div className="flex justify-center gap-3 flex-wrap">
         {choices.map(c => (
-          <button key={c} onClick={() => { playClick(); c === n ? onCorrect() : onWrong(); }}
+          <button key={c} onClick={() => { playClick(); if (c === n) onCorrect(); else onWrong(); }}
             className="kid-btn touch-target w-16 bg-primary/15 text-2xl text-foreground">{c}</button>
         ))}
       </div>
@@ -162,7 +162,7 @@ const ComparePlay: React.FC<{ max: number; options: number; onCorrect: () => voi
           { id: 'same', label: '一样多' },
           { id: 'right', label: '右边多' },
         ].map(opt => (
-          <button key={opt.id} onClick={() => { playClick(); opt.id === answer ? onCorrect() : onWrong(); }}
+          <button key={opt.id} onClick={() => { playClick(); if (opt.id === answer) onCorrect(); else onWrong(); }}
             className="kid-btn px-4 bg-primary/15 text-foreground">{opt.label}</button>
         ))}
       </div>
@@ -188,7 +188,7 @@ const ShapePlay: React.FC<{ options: number; onCorrect: () => void; onWrong: () 
       </svg>
       <div className="flex justify-center gap-2 flex-wrap">
         {choices.map(s => (
-          <button key={s.id} onClick={() => { playClick(); s.id === target.id ? onCorrect() : onWrong(); }}
+          <button key={s.id} onClick={() => { playClick(); if (s.id === target.id) onCorrect(); else onWrong(); }}
             className="kid-btn px-4 bg-primary/15 text-foreground">{s.name}</button>
         ))}
       </div>
@@ -215,7 +215,7 @@ const PatternPlay: React.FC<{ options: number; onCorrect: () => void; onWrong: (
       </div>
       <div className="flex justify-center gap-3">
         {colors.map(c => (
-          <button key={c.id} onClick={() => { playClick(); c.id === answer.id ? onCorrect() : onWrong(); }}
+          <button key={c.id} onClick={() => { playClick(); if (c.id === answer.id) onCorrect(); else onWrong(); }}
             className="kid-btn px-4 text-foreground" style={{ background: c.fill }}>{c.name}</button>
         ))}
       </div>
@@ -224,23 +224,26 @@ const PatternPlay: React.FC<{ options: number; onCorrect: () => void; onWrong: (
 };
 
 const AddPlay: React.FC<{ onCorrect: () => void; onWrong: () => void }> = ({ onCorrect, onWrong }) => {
-  const parked = useMemo(() => randInt(2, 6), []);
-  const coming = useMemo(() => randInt(1, 3), []);
-  const total = parked + coming;
+  const parked = useMemo(() => randInt(3, 7), []);
+  const delta = useMemo(() => randInt(1, 2), []);
+  const isAdd = useMemo(() => Math.random() > 0.45, []);
+  const answer = isAdd ? parked + delta : parked - delta;
   const choices = useMemo(() => {
-    const set = new Set([total, total + 1, Math.max(1, total - 1), parked]);
+    const set = new Set([answer, answer + 1, Math.max(1, answer - 1), parked]);
     return [...set].sort(() => Math.random() - 0.5).slice(0, 3);
-  }, [total, parked]);
+  }, [answer, parked]);
 
   return (
     <div className="text-center">
-      <p className="font-extrabold text-foreground mb-2">已经停了 {parked} 辆，又来了 {coming} 辆</p>
+      <p className="font-extrabold text-foreground mb-2">
+        {isAdd ? `已经停了 ${parked} 辆，又来了 ${delta} 辆` : `已经停了 ${parked} 辆，开走了 ${delta} 辆`}
+      </p>
       <CarRow count={parked} />
-      <p className="text-sm font-bold text-primary my-2">+ {coming}</p>
-      <p className="mb-3 font-extrabold">现在一共几辆？</p>
+      <p className="text-sm font-bold text-primary my-2">{isAdd ? `+ ${delta}` : `− ${delta}`}</p>
+      <p className="mb-3 font-extrabold">{isAdd ? '现在一共几辆？' : '现在还剩几辆？'}</p>
       <div className="flex justify-center gap-3">
         {choices.map(c => (
-          <button key={c} onClick={() => { playClick(); c === total ? onCorrect() : onWrong(); }}
+          <button key={c} onClick={() => { playClick(); if (c === answer) onCorrect(); else onWrong(); }}
             className="kid-btn touch-target w-16 bg-primary/15 text-2xl text-foreground">{c}</button>
         ))}
       </div>

@@ -74,8 +74,8 @@ interface Experiment {
 const EXPERIMENTS: Experiment[] = [
   { id: 1, title: '道闸长啥样？', emoji: '🔍', desc: '点击各部位，认识道闸的身体',
     prediction: { question: '你觉得道闸有几个主要部件？', options: [{ text: '3个', correct: false }, { text: '5个', correct: true }, { text: '2个', correct: false }] } },
-  { id: 2, title: '杠杆魔法', emoji: '⚖️', desc: '拖动重物，学习省力原理',
-    prediction: { question: '重物放在离支点更远的地方，抬起来会？', options: [{ text: '更省力', correct: true }, { text: '更费力', correct: false }] } },
+  { id: 2, title: '杠杆魔法', emoji: '⚖️', desc: '挪动小手的位置，感受省力',
+    prediction: { question: '小手离支点更远的地方去推，会怎么样？', options: [{ text: '更省力', correct: true }, { text: '更费力', correct: false }] } },
   { id: 3, title: '电机与太阳能', emoji: '⚡', desc: '让电机转起来，太阳能充电',
     prediction: { question: '太阳能板能给电机充电吗？', options: [{ text: '能！太阳光变成电', correct: true }, { text: '不能，必须用电池', correct: false }] } },
   { id: 4, title: '传感器安全', emoji: '👁️', desc: '红外线就像小眼睛',
@@ -153,7 +153,7 @@ const Exp2Lever: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    speak('用手指拖动重物，往右边移动，看看会怎样？');
+    speak('用手指把小手拖远一点，看看用力会不会变小？');
   }, []);
 
   const tilt = (weightPos - 50) * 0.4;
@@ -168,21 +168,21 @@ const Exp2Lever: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
       setDone(true);
       playSuccess();
       vibrate(100);
-      speak('发现了！重物离支点越远，越省力！这就是杠杆原理！');
+      speak('发现了！推的地方离支点越远，越省力！道闸的长杆就是这样工作的。');
       setTimeout(onComplete, 2500);
     }
   };
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="text-sm text-muted-foreground">拖动重物到杠杆右边，看看会怎样？</p>
+      <p className="text-sm text-muted-foreground">把小手拖到离中间更远的地方</p>
       <LeverDiagram weightPos={weightPos} tilt={tilt} />
       <div className="relative w-full max-w-xs h-20"
         onTouchMove={(e) => { const rect = e.currentTarget.getBoundingClientRect(); handleDrag(e.touches[0].clientX, rect); }}
         onMouseMove={(e) => { if (e.buttons) handleDrag(e.clientX, e.currentTarget.getBoundingClientRect()); }}>
         <div className="absolute bottom-4 text-3xl cursor-grab active:cursor-grabbing select-none transition-all duration-100"
           style={{ left: `${weightPos}%`, transform: 'translateX(-50%)' }}>
-          🏋️
+          ✋
         </div>
         <div className="absolute top-2 right-2 text-xs font-bold text-muted-foreground">
           用力: {Math.round(effortNeeded)}%
@@ -191,7 +191,7 @@ const Exp2Lever: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
       <div className="bg-secondary/20 rounded-2xl p-3 text-center max-w-xs">
         <p className="text-sm font-bold text-foreground">💡 杠杆原理 Lever</p>
         <p className="text-xs text-muted-foreground">
-          {done ? '重物离支点越远，抬起来越省力！道闸的杆臂就是杠杆！' : '试试把重物拖到更远的地方...'}
+          {done ? '推的地方离支点越远，越省力。道闸的长杆就是杠杆！' : '试试把小手拖得更远...'}
         </p>
       </div>
     </div>

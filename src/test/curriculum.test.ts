@@ -41,3 +41,12 @@ describe('age-layered vocabulary', () => {
     expect(vocabForBand('explorer').some(w => w.zh === '停')).toBe(true);
   });
 });
+
+describe('science facts used in copy', () => {
+  it('teaches effort farther from fulcrum, not load farther', async () => {
+    const lab = await import('../pages/LabPage.tsx?raw');
+    const src = String(lab.default ?? lab);
+    expect(src).toMatch(/推的地方离支点越远/);
+    expect(src).not.toMatch(/重物离支点越远，抬起来越省力/);
+  });
+});
