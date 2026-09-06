@@ -7,7 +7,10 @@ import { AGE_CONFIGS, type AgeBand } from '@/data/age';
 
 const ProfileSelect: React.FC = () => {
   const { state, selectProfile, updateAgeBand } = useGame();
-  const [pendingId, setPendingId] = useState<number | null>(null);
+  const [pendingId, setPendingId] = useState<number | null>(() => {
+    const current = state.profiles.find(p => p.id === state.currentProfileId);
+    return current && !current.ageChosen ? current.id : null;
+  });
 
   const pending = state.profiles.find(p => p.id === pendingId);
 

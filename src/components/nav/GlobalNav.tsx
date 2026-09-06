@@ -36,7 +36,7 @@ const GlobalNav: React.FC = () => {
       <div className="flex-1 flex flex-col gap-0.5">
         <div className="h-3 md:h-4 rounded-full bg-muted overflow-hidden">
           <div
-            className="h-full rounded-full rainbow-bar transition-all duration-1000"
+            className="h-full rounded-full bg-gradient-to-r from-primary to-golden transition-all duration-1000"
             style={{ width: `${100 - progress}%` }}
           />
         </div>
