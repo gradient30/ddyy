@@ -1,0 +1,16 @@
+---
+description: 道闸成长小路的产品与工程约束，每次改代码都生效
+alwaysApply: true
+---
+
+你在维护「道闸成长小路」：4–7 岁学前课，无后端，进度在 `localStorage['barrier-buddies-data']`。
+
+先读 `AGENTS.md`。课程真值在 `src/data/curriculum.ts`、`age.ts`、`vocab.ts`、`badges.ts`。不要发明第二套站点 id 或徽章名。
+
+- 年龄未选（`ageChosen === false`）不能进小路。
+- 站点按 `STATIONS` 顺序解锁，除非家长打开 `unlockAllStations`。
+- `completeStation` / `addBadge` / `addKnowledge` 的参数必须已在数据目录里。
+- 新语音先改 `scripts/generate-voice.py` 再生成 clip，禁止手写 `audio-manifest.ts`。
+- 杠杆事实：推的地方离支点越远越省力。
+- 禁止合并 `origin/dev`。禁止加后端或广告。
+- 改完跑 `npm run ci`。儿童 UI 改动要在浏览器按萌芽路径点一遍。

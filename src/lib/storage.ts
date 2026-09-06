@@ -112,7 +112,9 @@ export function loadGameState(): GameState {
 export function saveGameState(state: GameState): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {}
+  } catch {
+    /* quota or private mode */
+  }
 }
 
 function updateCurrentProfile(

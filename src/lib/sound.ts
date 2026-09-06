@@ -23,7 +23,9 @@ export function playClick(): void {
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.1);
-  } catch {}
+  } catch {
+    /* Web Audio may be blocked */
+  }
 }
 
 export function playSuccess(): void {
@@ -43,7 +45,9 @@ export function playSuccess(): void {
       osc.start(t);
       osc.stop(t + 0.3);
     });
-  } catch {}
+  } catch {
+    /* Web Audio may be blocked */
+  }
 }
 
 export function playError(): void {
@@ -60,7 +64,9 @@ export function playError(): void {
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.3);
-  } catch {}
+  } catch {
+    /* Web Audio may be blocked */
+  }
 }
 
 export function playStarCollect(): void {
@@ -80,7 +86,9 @@ export function playStarCollect(): void {
       osc.start(t);
       osc.stop(t + 0.2);
     });
-  } catch {}
+  } catch {
+    /* Web Audio may be blocked */
+  }
 }
 
 export function playBarrierLift(): void {
@@ -98,12 +106,16 @@ export function playBarrierLift(): void {
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.6);
-  } catch {}
+  } catch {
+    /* Web Audio may be blocked */
+  }
 }
 
 export function vibrate(ms = 50): void {
   if (!getAudioFlags().vibrate) return;
   try {
     if ('vibrate' in navigator) navigator.vibrate(ms);
-  } catch {}
+  } catch {
+    /* Web Audio may be blocked */
+  }
 }
