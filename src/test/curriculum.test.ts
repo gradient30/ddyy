@@ -51,3 +51,13 @@ describe('science facts used in copy', () => {
     expect(src).not.toMatch(/重物离支点越远，抬起来越省力/);
   });
 });
+
+describe('sensor safety demo', () => {
+  it('keeps the arm up when the beam is blocked', async () => {
+    const { barrierRaisedForSensor } = await import('@/lib/science');
+    expect(barrierRaisedForSensor(true, false)).toBe(true);
+    expect(barrierRaisedForSensor(true, true)).toBe(true);
+    expect(barrierRaisedForSensor(false, false)).toBe(false);
+    expect(barrierRaisedForSensor(false, true)).toBe(true);
+  });
+});
