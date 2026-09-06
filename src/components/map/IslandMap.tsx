@@ -28,7 +28,7 @@ const IslandMap: React.FC = () => {
 
   return (
     <div className="app-stage paper-page">
-      <div className="app-stage-body px-3 md:px-6 pb-3 flex flex-col max-w-5xl mx-auto w-full">
+      <div className="app-stage-body px-3 md:px-8 pb-3 flex flex-col w-full">
         <header className="flex items-center justify-between gap-3 shrink-0 mb-2">
           <div>
             <p className="text-xs font-bold text-primary">{age.label} · {age.years}</p>
@@ -60,8 +60,7 @@ const IslandMap: React.FC = () => {
           />
         </div>
 
-        <ol className="relative flex-1 min-h-0 overflow-auto space-y-2 md:space-y-3 pr-1">
-          <div className="absolute left-[27px] top-6 bottom-6 w-1 rounded-full bg-border/80" aria-hidden />
+        <ol className="relative flex-1 min-h-0 overflow-auto grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-3 pr-1 content-start">
           {STATIONS.map((station, index) => {
             const unlocked = isStationUnlocked(station.id, completed, unlockAll);
             const done = completed.includes(station.id);

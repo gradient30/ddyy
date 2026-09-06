@@ -178,7 +178,7 @@ const AssemblyGame: React.FC<{
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm font-bold text-foreground">🔧 把零件装到正确的位置！({placedCount}/{partsList.length})</p>
 
-      <div className={`relative w-full min-h-[220px] h-[36dvh] rounded-2xl bg-gradient-to-br ${level.bgClass} overflow-hidden border-2 border-border`}>
+      <div className={`relative w-full min-h-[260px] h-[48dvh] rounded-2xl bg-[#5C646C] overflow-hidden border-2 border-border`}>
         <MechanicalBarrier
           slots={{ base: 'base1', pillar: 'pillar1', motor: 'motor1', arm: 'arm1' }}
           className="absolute inset-0 w-full h-full"
@@ -339,7 +339,7 @@ const TreasurePage: React.FC = () => {
     <div className="app-stage paper-page">
       <GlobalNav />
       <div className="app-stage-body px-3 md:px-5 pb-3">
-        <div className="h-full max-w-4xl mx-auto flex flex-col">
+        <div className="h-full w-full flex flex-col">
           {activeLevel === null ? (
             <>
               <div className="text-center mb-6">

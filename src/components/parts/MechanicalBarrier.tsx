@@ -30,7 +30,7 @@ export function MechanicalBarrier({ slots, running = false, className }: Mechani
   const shaft = { x: 118, y: 96 };
 
   return (
-    <svg viewBox="0 0 420 220" className={className ?? 'w-full h-full'} role="img" aria-label="道闸装配预览">
+    <svg viewBox="0 0 420 220" preserveAspectRatio="xMidYMax meet" className={className ?? 'w-full h-full'} role="img" aria-label="道闸装配预览">
       <defs>
         <linearGradient id="mbRainbow" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#E25B4C" />

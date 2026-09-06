@@ -162,8 +162,8 @@ const FactoryPage: React.FC = () => {
         </div>
 
         {(mode === 'tutorial' && typeSelected) || mode === 'free' || mode === 'done' ? (
-          <div className="flex-1 min-h-0 rounded-3xl bg-card/80 border border-border overflow-hidden mb-2">
-            <MechanicalBarrier slots={slots} running={isRunning} className="w-full h-full min-h-[220px]" />
+          <div className="flex-1 min-h-0 overflow-hidden mb-2 bg-[#5C646C]">
+            <MechanicalBarrier slots={slots} running={isRunning} className="w-full h-full min-h-[280px] md:min-h-[360px]" />
           </div>
         ) : null}
 
